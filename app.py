@@ -1232,10 +1232,8 @@ def user_signup():
 # USER OTP PAGE
 # =========================================================
 
-@app.route(
-    '/user/verify-otp',
-    methods=['GET']
-)
+@app.route('/user/verify-otp', methods=['GET'])
+@app.route('/user-verify-otp', methods=['GET'])
 def verify_user_otp_get():
 
     return render_template(
@@ -1247,10 +1245,8 @@ def verify_user_otp_get():
 # USER VERIFY OTP
 # =========================================================
 
-@app.route(
-    '/user/verify-otp',
-    methods=['POST']
-)
+@app.route('/user/verify-otp', methods=['POST'])
+@app.route('/user-verify-otp', methods=['POST'])
 def verify_user_otp_post():
 
     user_otp = request.form['otp']
