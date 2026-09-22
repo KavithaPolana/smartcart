@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="auth-page" style="background: radial-gradient(circle at top right, #1e1b4b 0%, #0f172a 100%);">
+
+    <div class="auth-card" style="border-top: 4px solid var(--primary);">
+        <div class="auth-header">
+            <div class="auth-logo-badge" style="background: linear-gradient(135deg, #4f46e5 0%, #0f172a 100%);">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h2 class="auth-title">Admin Portal</h2>
+            <p class="auth-subtitle">Sign in to manage SmartCart inventory and store</p>
+        </div>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category if category != 'message' else 'danger' }}">
+                <div class="flash-alert-content">
+                  <i class="fa-solid fa-circle-exclamation flash-alert-icon"></i>
+                  <span>{{ message }}</span>
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/admin-login">
+            <div class="form-group">
+                <label class="form-label">Admin Email <span class="req">*</span></label>
+                <div class="input-wrapper">
+                    <input type="email" name="email" class="form-control" placeholder="admin@smartcart.com" required>
+                    <i class="fa-solid fa-envelope input-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password <span class="req">*</span></label>
+                <div class="input-wrapper">
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                    <i class="fa-solid fa-lock input-icon"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+                <i class="fa-solid fa-right-to-bracket"></i> Admin Login
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>New Admin? <a href="/admin-signup">Register Admin</a></p>
+            <p style="margin-top: 0.5rem;"><a href="/user-login" style="color: var(--text-muted); font-size: 0.85rem;"><i class="fa-solid fa-store"></i> Customer Login</a></p>
+        </div>
+    </div>
+
+</body>
+</html>

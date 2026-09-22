@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header class="smart-navbar">
+        <a href="/user-dashboard" class="brand-logo">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>SmartCart</span>
+        </a>
+
+        <ul class="nav-links">
+            <li>
+                <a href="/user/address" class="nav-link">
+                    <i class="fa-solid fa-arrow-left"></i> Change Address
+                </a>
+            </li>
+        </ul>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-wrapper page-wrapper-narrow">
+
+        <!-- Checkout Stepper -->
+        <div class="checkout-stepper">
+            <div class="step-item completed">
+                <div class="step-num"><i class="fa-solid fa-check"></i></div>
+                <span>Shopping Cart</span>
+            </div>
+            <div class="step-line completed"></div>
+            <div class="step-item completed">
+                <div class="step-num"><i class="fa-solid fa-check"></i></div>
+                <span>Address</span>
+            </div>
+            <div class="step-line completed"></div>
+            <div class="step-item active">
+                <div class="step-num">3</div>
+                <span>Payment</span>
+            </div>
+        </div>
+
+        <div class="card glass-card" style="text-align: center; padding: 2.5rem 2rem;">
+            
+            <div style="width: 70px; height: 70px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1.25rem;">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main);">
+                Complete Your Payment
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">
+                Powered securely by Razorpay
+            </p>
+
+            <div style="background: var(--bg-surface-subtle); border-radius: var(--radius-lg); padding: 1.5rem; margin: 1.75rem 0; border: 1px solid var(--border-subtle);">
+                <span style="display: block; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 0.25rem;">
+                    Total Payable Amount
+                </span>
+                <span style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">
+                    ₹{{ total }}
+                </span>
+                <div style="display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem; color: var(--text-muted); font-size: 0.85rem;">
+                    <span><i class="fa-solid fa-lock" style="color: var(--success);"></i> 256-Bit SSL Encrypted</span>
+                    <span><i class="fa-brands fa-cc-visa"></i> <i class="fa-brands fa-cc-mastercard"></i> UPI / Cards</span>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                id="pay-button"
+                class="btn btn-primary btn-block btn-lg"
+                style="font-size: 1.1rem; padding: 1rem;"
+            >
+                <i class="fa-solid fa-bolt"></i> Pay with Razorpay Now
+            </button>
+
+            <div style="margin-top: 1.5rem;">
+                <a href="/user/address" class="btn btn-outline btn-sm">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Delivery Address
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Mobile Sticky Bottom Navigation Bar (Flipkart Style) -->
+    <nav class="smart-bottom-bar">
+        <a href="/user-dashboard" class="bottom-bar-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/user/products" class="bottom-bar-item">
+            <i class="fa-solid fa-store"></i>
+            <span>Products</span>
+        </a>
+        <a href="/user/my-orders" class="bottom-bar-item">
+            <i class="fa-solid fa-box-open"></i>
+            <span>Orders</span>
+        </a>
+        <a href="/user/profile" class="bottom-bar-item">
+            <i class="fa-regular fa-user"></i>
+            <span>Account</span>
+        </a>
+        <a href="/user/cart" class="bottom-bar-item active">
+            <div class="bottom-cart-badge-wrap">
+                <i class="fa-solid fa-cart-shopping"></i>
+                {% set cart_len = session.get('cart')|length if session.get('cart') else 0 %}
+                {% if cart_len > 0 %}
+                <span class="bottom-cart-count">{{ cart_len }}</span>
+                {% endif %}
+            </div>
+            <span>Cart</span>
+        </a>
+    </nav>
+
+    <!-- Footer -->
+    <footer class="smart-footer">
+        <p>&copy; 2026 SmartCart. All rights reserved.</p>
+    </footer>
+
+    <!-- Razorpay Checkout Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        const options = {
+            key: "{{ razorpay_key_id }}",
+            amount: "{{ amount }}",
+            currency: "INR",
+            name: "SmartCart",
+            description: "SmartCart Order Payment",
+            order_id: "{{ razorpay_order_id }}",
+            prefill: {
+                name: "{{ user_name }}",
+                email: "{{ user_email }}",
+                contact: "{{ user_mobile }}"
+            },
+            theme: {
+                color: "#4f46e5"
+            },
+            handler: function(response) {
+                const payBtn = document.getElementById("pay-button");
+                if (payBtn) {
+                    payBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying Payment...';
+                    payBtn.disabled = true;
+                }
+
+                fetch("/user/payment-success", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature
+                    })
+                })
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (data.success) {
+                        window.location.href = "/user/payment-success-page";
+                    } else {
+                        alert("Payment verification failed.");
+                        if (payBtn) {
+                            payBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Pay with Razorpay Now';
+                            payBtn.disabled = false;
+                        }
+                    }
+                })
+                .catch(function(error) {
+                    console.log("Payment Error:", error);
+                    alert("An error occurred during verification.");
+                    if (payBtn) {
+                        payBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Pay with Razorpay Now';
+                        payBtn.disabled = false;
+                    }
+                });
+            }
+        };
+
+        const razorpayCheckout = new Razorpay(options);
+
+        document.getElementById("pay-button").onclick = function(event) {
+            razorpayCheckout.open();
+            event.preventDefault();
+        };
+    </script>
+
+</body>
+</html>

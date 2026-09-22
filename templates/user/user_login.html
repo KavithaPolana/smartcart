@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="auth-page">
+
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo-badge">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+            <h2 class="auth-title">Welcome Back</h2>
+            <p class="auth-subtitle">Login to your SmartCart account</p>
+        </div>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category if category != 'message' else 'danger' }}">
+                <div class="flash-alert-content">
+                  <i class="fa-solid fa-circle-exclamation flash-alert-icon"></i>
+                  <span>{{ message }}</span>
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/user-login">
+            <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <div class="input-wrapper">
+                    <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
+                    <i class="fa-solid fa-envelope input-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password <span class="req">*</span></label>
+                <div class="input-wrapper">
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                    <i class="fa-solid fa-lock input-icon"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+                <i class="fa-solid fa-right-to-bracket"></i> Login
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="/user-signup">Create Account</a></p>
+            <p style="margin-top: 0.5rem;"><a href="/admin-login" style="color: var(--text-muted); font-size: 0.85rem;"><i class="fa-solid fa-shield-halved"></i> Admin Login</a></p>
+        </div>
+    </div>
+
+</body>
+</html>

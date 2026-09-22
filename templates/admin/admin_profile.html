@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Profile - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Admin Header / Navbar -->
+    <header class="admin-header-bar">
+        <a href="/admin-dashboard" class="admin-logo">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>SmartCart <span style="font-size: 0.8rem; font-weight: 500; color: #94a3b8;">Admin</span></span>
+        </a>
+
+        <nav class="admin-nav">
+            <a href="/admin-dashboard">
+                <i class="fa-solid fa-gauge"></i> Dashboard
+            </a>
+            <a href="/admin/item-list">
+                <i class="fa-solid fa-boxes-stacked"></i> Products
+            </a>
+            <a href="/admin/add-item">
+                <i class="fa-solid fa-plus-circle"></i> Add Product
+            </a>
+            <a href="/admin/profile" class="active">
+                <i class="fa-solid fa-user-shield"></i> Profile
+            </a>
+            <a href="/admin-logout" style="color: #f87171;">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-wrapper page-wrapper-narrow">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category if category != 'message' else 'success' }}">
+                <div class="flash-alert-content">
+                  <i class="fa-solid fa-circle-check flash-alert-icon"></i>
+                  <span>{{ message }}</span>
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div class="card glass-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fa-solid fa-user-shield" style="color: var(--primary);"></i> Admin Profile Settings
+                </h2>
+                <a href="/admin-dashboard" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-arrow-left"></i> Dashboard
+                </a>
+            </div>
+
+            <!-- Current Avatar Preview -->
+            <div class="profile-avatar-wrapper">
+                {% if admin.profile_image %}
+                    <img src="/static/uploads/admin_profiles/{{ admin.profile_image }}" alt="{{ admin.name }}" class="profile-avatar-large">
+                {% else %}
+                    <div class="profile-avatar-placeholder" style="background: linear-gradient(135deg, #0f172a 0%, #334155 100%);">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                {% endif %}
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-top: 0.75rem; color: var(--text-main);">{{ admin.name }}</h3>
+                <span class="badge badge-primary" style="margin-top: 0.35rem;">System Administrator</span>
+            </div>
+
+            <form method="POST" action="/admin/profile" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label">Admin Name <span class="req">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" name="name" class="form-control" value="{{ admin.name }}" required>
+                        <i class="fa-solid fa-user input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address <span class="req">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="email" name="email" class="form-control" value="{{ admin.email }}" required>
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">New Password <span style="font-size: 0.8rem; color: var(--text-muted);">(Leave blank to keep current)</span></label>
+                    <div class="input-wrapper">
+                        <input type="password" name="password" class="form-control" placeholder="••••••••">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Upload Profile Picture (Optional)</label>
+                    <input type="file" name="profile_image" class="form-control" accept="image/*">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1.5rem;">
+                    <i class="fa-solid fa-floppy-disk"></i> Update Admin Profile
+                </button>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="smart-footer">
+        <p>&copy; 2026 SmartCart Admin Control Center.</p>
+    </footer>
+
+</body>
+</html>

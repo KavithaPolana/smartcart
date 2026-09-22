@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation #{{ order.order_id }} - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header class="smart-navbar">
+        <a href="/user-dashboard" class="brand-logo">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>SmartCart</span>
+        </a>
+
+        <ul class="nav-links">
+            <li>
+                <a href="/user/products" class="nav-link">
+                    <i class="fa-solid fa-store"></i> Store
+                </a>
+            </li>
+            <li>
+                <a href="/user/my-orders" class="nav-link">
+                    <i class="fa-solid fa-box-open"></i> My Orders
+                </a>
+            </li>
+        </ul>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-wrapper page-wrapper-medium">
+
+        <div class="card glass-card" style="text-align: center; padding: 3rem 2rem;">
+            
+            <div class="success-badge-icon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem;">
+                🎉 Your Order is Confirmed!
+            </h1>
+            <p style="color: var(--text-muted); font-size: 1.05rem;">
+                Thank you for shopping with <strong>SmartCart</strong>. We've received your order and are preparing it.
+            </p>
+
+            <!-- Order Metadata Grid -->
+            <div class="order-info-grid">
+                <div class="order-info-item">
+                    <strong>Order ID</strong>
+                    <span>#{{ order.order_id }}</span>
+                </div>
+                <div class="order-info-item">
+                    <strong>Payment ID</strong>
+                    <span style="font-size: 0.85rem; font-family: monospace; word-break: break-all;">{{ order.razorpay_payment_id }}</span>
+                </div>
+                <div class="order-info-item">
+                    <strong>Total Paid</strong>
+                    <span style="color: var(--primary);">₹{{ order.amount }}</span>
+                </div>
+                <div class="order-info-item">
+                    <strong>Status</strong>
+                    <span class="badge badge-success">{{ order.payment_status }}</span>
+                </div>
+                <div class="order-info-item" style="grid-column: 1 / -1;">
+                    <strong>Order Date</strong>
+                    <span>{{ order.created_at }}</span>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <div style="margin: 2rem 0; text-align: left;">
+                <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fa-solid fa-boxes-packing" style="color: var(--primary);"></i> Order Summary
+                </h3>
+
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Product Item</th>
+                                <th style="text-align: center;">Qty</th>
+                                <th style="text-align: right;">Unit Price</th>
+                                <th style="text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for it in items %}
+                            <tr>
+                                <td style="font-weight: 600;">{{ it.product_name }}</td>
+                                <td style="text-align: center;">{{ it.quantity }}</td>
+                                <td style="text-align: right;">₹{{ it.price }}</td>
+                                <td style="text-align: right; font-weight: 700; color: var(--primary);">₹{{ it.price * it.quantity }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle);">
+                <a href="/user/download-invoice/{{ order.order_id }}" class="btn btn-success btn-lg">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> Download Invoice
+                </a>
+
+                <a href="/user/my-orders" class="btn btn-primary btn-lg">
+                    <i class="fa-solid fa-receipt"></i> View My Orders
+                </a>
+
+                <a href="/user/products" class="btn btn-secondary btn-lg">
+                    <i class="fa-solid fa-bag-shopping"></i> Continue Shopping
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Mobile Sticky Bottom Navigation Bar (Flipkart Style) -->
+    <nav class="smart-bottom-bar">
+        <a href="/user-dashboard" class="bottom-bar-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/user/products" class="bottom-bar-item">
+            <i class="fa-solid fa-store"></i>
+            <span>Products</span>
+        </a>
+        <a href="/user/my-orders" class="bottom-bar-item active">
+            <i class="fa-solid fa-box-open"></i>
+            <span>Orders</span>
+        </a>
+        <a href="/user/profile" class="bottom-bar-item">
+            <i class="fa-regular fa-user"></i>
+            <span>Account</span>
+        </a>
+        <a href="/user/cart" class="bottom-bar-item">
+            <div class="bottom-cart-badge-wrap">
+                <i class="fa-solid fa-cart-shopping"></i>
+                {% set cart_len = session.get('cart')|length if session.get('cart') else 0 %}
+                {% if cart_len > 0 %}
+                <span class="bottom-cart-count">{{ cart_len }}</span>
+                {% endif %}
+            </div>
+            <span>Cart</span>
+        </a>
+    </nav>
+
+    <!-- Footer -->
+    <footer class="smart-footer">
+        <p>&copy; 2026 SmartCart. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

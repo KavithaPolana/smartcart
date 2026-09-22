@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Inventory - SmartCart Admin</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Admin Header / Navbar -->
+    <header class="admin-header-bar">
+        <a href="/admin-dashboard" class="admin-logo">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>SmartCart <span style="font-size: 0.8rem; font-weight: 500; color: #94a3b8;">Admin</span></span>
+        </a>
+
+        <nav class="admin-nav">
+            <a href="/admin-dashboard">
+                <i class="fa-solid fa-gauge"></i> Dashboard
+            </a>
+            <a href="/admin/item-list" class="active">
+                <i class="fa-solid fa-boxes-stacked"></i> Products
+            </a>
+            <a href="/admin/add-item">
+                <i class="fa-solid fa-plus-circle"></i> Add Product
+            </a>
+            <a href="/admin/profile">
+                <i class="fa-solid fa-user-shield"></i> Profile
+            </a>
+            <a href="/admin-logout" style="color: #f87171;">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">
+                    <i class="fa-solid fa-boxes-stacked" style="color: var(--primary);"></i> Product Inventory
+                </h1>
+                <p class="page-subtitle">Manage catalog items, update prices, and control store listings</p>
+            </div>
+            <div>
+                <a href="/admin/add-item" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i> Add New Product
+                </a>
+            </div>
+        </div>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category if category != 'message' else 'success' }}">
+                <div class="flash-alert-content">
+                  <i class="fa-solid fa-circle-check flash-alert-icon"></i>
+                  <span>{{ message }}</span>
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Filter & Search Bar -->
+        <div class="filter-bar">
+            <div class="filter-forms-wrapper">
+                <form method="GET" action="/admin/item-list" class="search-form">
+                    <div class="input-wrapper" style="flex: 1;">
+                        <input
+                            type="text"
+                            name="search"
+                            class="form-control"
+                            placeholder="Search products by name or ID..."
+                            value="{{ request.args.get('search', '') }}"
+                        >
+                        <i class="fa-solid fa-magnifying-glass input-icon"></i>
+                    </div>
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fa-solid fa-search"></i> Search
+                    </button>
+                </form>
+
+                <form method="GET" action="/admin/item-list" class="category-form">
+                    <select name="category" class="form-control" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option
+                            value="{{ cat.category }}"
+                            {% if request.args.get('category') == cat.category %} selected {% endif %}
+                        >
+                            {{ cat.category }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% if request.args.get('search') %}
+                        <input type="hidden" name="search" value="{{ request.args.get('search') }}">
+                    {% endif %}
+                </form>
+
+                {% if request.args.get('search') or request.args.get('category') %}
+                    <a href="/admin/item-list" class="btn btn-outline btn-sm">
+                        <i class="fa-solid fa-rotate-left"></i> Reset
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Products Data Table -->
+        {% if products|length == 0 %}
+            <div class="card" style="text-align: center; padding: 4rem 2rem;">
+                <div style="font-size: 3rem; color: var(--text-light); margin-bottom: 1rem;">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <h3>No Products Found</h3>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">No catalog items match your search filter.</p>
+                <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+                    <a href="/admin/item-list" class="btn btn-secondary">View All Items</a>
+                    <a href="/admin/add-item" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add New Product</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">ID</th>
+                            <th style="width: 90px;">Image</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td style="font-weight: 700; color: var(--text-muted);">
+                                #{{ product.product_id }}
+                            </td>
+                            <td>
+                                <img
+                                    src="/static/uploads/product_images/{{ product.image }}"
+                                    alt="{{ product.name }}"
+                                    class="table-thumbnail"
+                                >
+                            </td>
+                            <td>
+                                <div style="font-weight: 700; color: var(--text-main);">
+                                    {{ product.name }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge badge-neutral">
+                                    {{ product.category }}
+                                </span>
+                            </td>
+                            <td style="font-weight: 800; color: var(--primary);">
+                                ₹{{ product.price }}
+                            </td>
+                            <td style="text-align: right;">
+                                <div style="display: inline-flex; gap: 0.4rem;">
+                                    <a
+                                        href="/admin/view-item/{{ product.product_id }}"
+                                        class="btn btn-secondary btn-sm"
+                                        title="View Details"
+                                    >
+                                        <i class="fa-solid fa-eye"></i> View
+                                    </a>
+                                    <a
+                                        href="/admin/update-item/{{ product.product_id }}"
+                                        class="btn btn-outline-primary btn-sm"
+                                        title="Edit Product"
+                                    >
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </a>
+                                    <a
+                                        href="/admin/delete-item/{{ product.product_id }}"
+                                        class="btn btn-outline btn-sm"
+                                        style="color: var(--danger); border-color: var(--danger-light);"
+                                        title="Delete Product"
+                                        onclick="return confirm('Are you sure you want to delete this product?')"
+                                    >
+                                        <i class="fa-solid fa-trash-can"></i> Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="smart-footer">
+        <p>&copy; 2026 SmartCart Admin Control Center.</p>
+    </footer>
+
+</body>
+</html>

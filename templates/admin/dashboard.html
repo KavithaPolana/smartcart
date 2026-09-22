@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Admin Header / Navbar -->
+    <header class="admin-header-bar">
+        <a href="/admin-dashboard" class="admin-logo">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>SmartCart <span style="font-size: 0.8rem; font-weight: 500; color: #94a3b8;">Admin</span></span>
+        </a>
+
+        <nav class="admin-nav">
+            <a href="/admin-dashboard" class="active">
+                <i class="fa-solid fa-gauge"></i> Dashboard
+            </a>
+            <a href="/admin/item-list">
+                <i class="fa-solid fa-boxes-stacked"></i> Products
+            </a>
+            <a href="/admin/add-item">
+                <i class="fa-solid fa-plus-circle"></i> Add Product
+            </a>
+            <a href="/admin/profile">
+                <i class="fa-solid fa-user-shield"></i> Profile
+            </a>
+            <a href="/admin-logout" style="color: #f87171;">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-wrapper">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category if category != 'message' else 'success' }}">
+                <div class="flash-alert-content">
+                  <i class="fa-solid fa-circle-check flash-alert-icon"></i>
+                  <span>{{ message }}</span>
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Welcome Banner -->
+        <div class="dashboard-hero" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);">
+            <h2>Welcome, {{ admin_name }}! 🛡️</h2>
+            <p>SmartCart Administrator Dashboard. Manage catalog items, monitor product inventory, and update your administrator profile.</p>
+        </div>
+
+        <!-- Quick Hub Actions -->
+        <div class="hub-grid">
+            <a href="/admin/add-item" class="hub-card">
+                <div class="hub-icon-wrapper" style="background: var(--primary-light); color: var(--primary);">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <div>
+                    <h3 class="hub-title">Add New Product</h3>
+                    <p class="hub-desc">Upload product images, set prices, write descriptions and assign categories.</p>
+                </div>
+            </a>
+
+            <a href="/admin/item-list" class="hub-card">
+                <div class="hub-icon-wrapper" style="background: var(--success-light); color: var(--success);">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+                <div>
+                    <h3 class="hub-title">Manage Inventory</h3>
+                    <p class="hub-desc">View all products, search items, edit details or remove listings.</p>
+                </div>
+            </a>
+
+            <a href="/admin/profile" class="hub-card">
+                <div class="hub-icon-wrapper" style="background: var(--accent-light); color: var(--accent);">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <div>
+                    <h3 class="hub-title">Admin Profile</h3>
+                    <p class="hub-desc">Update personal administrator details, security credentials and avatar.</p>
+                </div>
+            </a>
+
+            <a href="/user/products" target="_blank" class="hub-card">
+                <div class="hub-icon-wrapper" style="background: #e0f2fe; color: #0284c7;">
+                    <i class="fa-solid fa-store"></i>
+                </div>
+                <div>
+                    <h3 class="hub-title">Customer Storefront <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem;"></i></h3>
+                    <p class="hub-desc">Preview the live storefront as experienced by customers.</p>
+                </div>
+            </a>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="smart-footer">
+        <p>&copy; 2026 SmartCart Admin Control Center.</p>
+    </footer>
+
+</body>
+</html>

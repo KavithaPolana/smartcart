@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product #{{ product.product_id }} - SmartCart Admin</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Admin Header / Navbar -->
+    <header class="admin-header-bar">
+        <a href="/admin-dashboard" class="admin-logo">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>SmartCart <span style="font-size: 0.8rem; font-weight: 500; color: #94a3b8;">Admin</span></span>
+        </a>
+
+        <nav class="admin-nav">
+            <a href="/admin-dashboard">
+                <i class="fa-solid fa-gauge"></i> Dashboard
+            </a>
+            <a href="/admin/item-list" class="active">
+                <i class="fa-solid fa-boxes-stacked"></i> Products
+            </a>
+            <a href="/admin/add-item">
+                <i class="fa-solid fa-plus-circle"></i> Add Product
+            </a>
+            <a href="/admin/profile">
+                <i class="fa-solid fa-user-shield"></i> Profile
+            </a>
+            <a href="/admin-logout" style="color: #f87171;">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-wrapper page-wrapper-medium">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category if category != 'message' else 'success' }}">
+                <div class="flash-alert-content">
+                  <i class="fa-solid fa-circle-check flash-alert-icon"></i>
+                  <span>{{ message }}</span>
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div class="card glass-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i> Edit Product #{{ product.product_id }}
+                </h2>
+                <a href="/admin/item-list" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-arrow-left"></i> Product List
+                </a>
+            </div>
+
+            <form method="POST" action="/admin/update-item/{{ product.product_id }}" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label">Product Name <span class="req">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" name="name" class="form-control" value="{{ product.name }}" required>
+                        <i class="fa-solid fa-tag input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Category <span class="req">*</span></label>
+                        <div class="input-wrapper">
+                            <input type="text" name="category" class="form-control" value="{{ product.category }}" required>
+                            <i class="fa-solid fa-layer-group input-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Price (₹ INR) <span class="req">*</span></label>
+                        <div class="input-wrapper">
+                            <input type="number" step="0.01" name="price" class="form-control" value="{{ product.price }}" required>
+                            <i class="fa-solid fa-indian-rupee-sign input-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description <span class="req">*</span></label>
+                    <textarea name="description" class="form-control" rows="4" required>{{ product.description }}</textarea>
+                </div>
+
+                <div class="input-image-preview-group">
+                    <div>
+                        <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">Current Image</span>
+                        <img src="/static/uploads/product_images/{{ product.image }}" alt="{{ product.name }}" style="width: 90px; height: 90px; object-fit: contain; background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 4px;">
+                    </div>
+                    <div style="flex: 1; width: 100%;">
+                        <label class="form-label">Choose New Image (Optional)</label>
+                        <input type="file" name="image" class="form-control" accept="image/*">
+                        <span style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; display: block;">Leave empty to keep existing image</span>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/admin/item-list" class="btn btn-secondary">
+                        <i class="fa-solid fa-xmark"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fa-solid fa-floppy-disk"></i> Update Product
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="smart-footer">
+        <p>&copy; 2026 SmartCart Admin Control Center.</p>
+    </footer>
+
+</body>
+</html>

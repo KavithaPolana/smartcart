@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartCart - Modern Online Shopping</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body style="background-color: var(--smart-bg);">
+
+    <!-- =========================================================
+         1. SINGLE CLEAN UNIFIED NAVBAR (No Top Sub-Bar)
+         ========================================================= -->
+    <header class="smart-main-navbar">
+        <div class="smart-nav-container">
+            <!-- Brand Logo -->
+            <a href="/user-dashboard" class="smart-brand-link" title="SmartCart Home">
+                <div class="smart-brand-icon-box">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+                <div class="smart-brand-text">
+                    <div class="smart-logo-title">Smart<span>Cart</span></div>
+                    <div class="smart-logo-subtitle">Shop Smart & Save</div>
+                </div>
+            </a>
+
+            <!-- Search Bar -->
+            <div class="smart-nav-search-wrap">
+                <form method="GET" action="/user/products" class="smart-nav-search-form" id="search-form">
+                    <i class="fa-solid fa-magnifying-glass smart-nav-search-icon"></i>
+                    <input
+                        type="text"
+                        name="search"
+                        id="navbar-search-input"
+                        class="smart-nav-search-input"
+                        placeholder="Search products, brands and essentials..."
+                        value="{{ request.args.get('search', '') }}"
+                        autocomplete="off"
+                    >
+                </form>
+            </div>
+
+            <!-- Desktop Nav Menu -->
+            <ul class="smart-nav-menu">
+                <li>
+                    <a href="/user-dashboard" class="smart-nav-item-link active">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/user/products" class="smart-nav-item-link">
+                        <i class="fa-solid fa-store"></i>
+                        <span>All Products</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/user/my-orders" class="smart-nav-item-link">
+                        <i class="fa-solid fa-box-open"></i>
+                        <span>Orders</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/user/profile" class="smart-nav-item-link">
+                        <i class="fa-regular fa-user"></i>
+                        <span>{{ user_name if user_name else 'Profile' }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/user/cart" class="smart-cart-btn" id="cart-nav-btn">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span>Cart</span>
+                        <span class="smart-cart-count" id="cart-nav-count">{{ session.get('cart')|length if session.get('cart') else 0 }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/user-logout" class="smart-nav-item-link" style="color: var(--danger);" title="Logout">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Mobile Hamburger Toggle -->
+            <button type="button" class="smart-mobile-toggle" id="mobile-menu-btn" aria-label="Toggle Navigation">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Drawer Menu -->
+        <div class="smart-mobile-drawer" id="mobile-drawer">
+            <a href="/user-dashboard" class="smart-nav-item-link active">
+                <i class="fa-solid fa-house"></i> Home Dashboard
+            </a>
+            <a href="/user/products" class="smart-nav-item-link">
+                <i class="fa-solid fa-store"></i> All Products Catalog
+            </a>
+            <a href="/user/my-orders" class="smart-nav-item-link">
+                <i class="fa-solid fa-box-open"></i> My Orders & Returns
+            </a>
+            <a href="/user/profile" class="smart-nav-item-link">
+                <i class="fa-regular fa-user"></i> My Profile ({{ user_name }})
+            </a>
+            <a href="/user/cart" class="smart-nav-item-link">
+                <i class="fa-solid fa-bag-shopping"></i> Shopping Cart ({{ session.get('cart')|length if session.get('cart') else 0 }})
+            </a>
+            <a href="/user-logout" class="smart-nav-item-link" style="color: var(--danger);">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </a>
+        </div>
+    </header>
+
+    <!-- Toast Notification Container -->
+    <div id="toast" class="toast-notification">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toast-message">Item added to cart!</span>
+    </div>
+
+    <!-- =========================================================
+         DELIVERY LOCATION STRIP (Flipkart Style)
+         ========================================================= -->
+    <div class="smart-delivery-strip">
+        <div class="smart-delivery-inner">
+            <div class="smart-delivery-info">
+                <i class="fa-solid fa-location-dot smart-location-icon"></i>
+                <span class="smart-location-label">Deliver to:</span>
+                {% if default_address %}
+                    <span class="smart-location-address">
+                        <strong>{{ default_address.full_name }}</strong>, {{ default_address.city }} - {{ default_address.pincode }}
+                    </span>
+                {% else %}
+                    <span class="smart-location-address">Select your delivery location</span>
+                {% endif %}
+            </div>
+            <a href="/user/address" class="smart-location-change-btn">
+                <span>Change</span> <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         2. CATEGORY NAVIGATION STRIP (100% Working & Dynamic)
+         ========================================================= -->
+    <nav class="smart-category-section">
+        <div class="smart-category-scroll-container">
+            <!-- All Items / Home -->
+            <a href="/user/products" class="smart-cat-pill active" title="View All Products">
+                <div class="smart-cat-icon-circle">
+                    <i class="fa-solid fa-border-all"></i>
+                </div>
+                <span class="smart-cat-name">All Items</span>
+            </a>
+
+            <!-- Dynamic Backend Categories -->
+            {% for cat in categories %}
+            <a href="/user/products?category={{ cat.category }}" class="smart-cat-pill" title="Explore {{ cat.category }}">
+                <div class="smart-cat-icon-circle">
+                    {% set cat_lower = cat.category.lower() %}
+                    {% if 'mobile' in cat_lower or 'phone' in cat_lower %}
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    {% elif 'elect' in cat_lower or 'laptop' in cat_lower %}
+                        <i class="fa-solid fa-laptop"></i>
+                    {% elif 'fashion' in cat_lower or 'cloth' in cat_lower or 'wear' in cat_lower or 'saree' in cat_lower %}
+                        <i class="fa-solid fa-shirt"></i>
+                    {% elif 'beauty' in cat_lower or 'serum' in cat_lower or 'care' in cat_lower %}
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    {% elif 'home' in cat_lower or 'decor' in cat_lower or 'furn' in cat_lower %}
+                        <i class="fa-solid fa-house"></i>
+                    {% elif 'appl' in cat_lower or 'tv' in cat_lower %}
+                        <i class="fa-solid fa-tv"></i>
+                    {% elif 'toy' in cat_lower or 'kid' in cat_lower %}
+                        <i class="fa-solid fa-shapes"></i>
+                    {% elif 'sport' in cat_lower or 'fit' in cat_lower %}
+                        <i class="fa-solid fa-volleyball"></i>
+                    {% elif 'grocer' in cat_lower or 'food' in cat_lower %}
+                        <i class="fa-solid fa-basket-shopping"></i>
+                    {% else %}
+                        <i class="fa-solid fa-tag"></i>
+                    {% endif %}
+                </div>
+                <span class="smart-cat-name">{{ cat.category }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </nav>
+
+    <!-- Main Wrapper -->
+    <main style="max-width: 1400px; margin: 0 auto; padding: 0.5rem 0;">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container" style="padding: 1rem 1rem 0;">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category if category != 'message' else 'success' }}">
+                <div class="flash-alert-content">
+                  <i class="fa-solid fa-circle-check flash-alert-icon"></i>
+                  <span>{{ message }}</span>
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- =========================================================
+             3. HERO PROMOTIONAL BANNER CAROUSEL
+             ========================================================= -->
+        <section class="smart-hero-section">
+            <div class="smart-carousel-container" id="hero-carousel">
+                
+                <!-- Slide 1: Festive Grand Sale -->
+                <div class="smart-slide-item smart-slide-indigo active">
+                    <div class="smart-slide-content">
+                        <div class="smart-slide-badge">
+                            <i class="fa-solid fa-bolt"></i> SMARTCART MEGA SALE
+                        </div>
+                        <h1 class="smart-slide-title">
+                            Up to 70% OFF Everything
+                        </h1>
+                        <p class="smart-slide-desc">
+                            Discover premium smartphones, wireless audio, trending fashion and home essentials with instant checkout.
+                        </p>
+                        <a href="/user/products" class="smart-slide-btn">
+                            <i class="fa-solid fa-bag-shopping"></i> Explore Deals
+                        </a>
+                    </div>
+
+                    <div class="smart-slide-art">
+                        <div class="smart-slide-art-box">
+                            <i class="fa-solid fa-gift"></i>
+                            <span>Mega Savings</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Electronics & Tech -->
+                <div class="smart-slide-item smart-slide-cyan">
+                    <div class="smart-slide-content">
+                        <div class="smart-slide-badge">
+                            <i class="fa-solid fa-microchip"></i> NEXT-GEN ELECTRONICS
+                        </div>
+                        <h1 class="smart-slide-title">
+                            Smartphones & Laptops
+                        </h1>
+                        <p class="smart-slide-desc">
+                            Grab the newest 5G smartphones, M2 MacBooks, ANC earbuds, and smart appliances at best prices.
+                        </p>
+                        <a href="/user/products?category=Electronics" class="smart-slide-btn">
+                            <i class="fa-solid fa-laptop"></i> Shop Electronics
+                        </a>
+                    </div>
+
+                    <div class="smart-slide-art">
+                        <div class="smart-slide-art-box">
+                            <i class="fa-solid fa-headphones-simple"></i>
+                            <span>Audio & Tech</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Fashion & Trends -->
+                <div class="smart-slide-item smart-slide-rose">
+                    <div class="smart-slide-content">
+                        <div class="smart-slide-badge">
+                            <i class="fa-solid fa-shirt"></i> TRENDING FASHION
+                        </div>
+                        <h1 class="smart-slide-title">
+                            Style That Stands Out
+                        </h1>
+                        <p class="smart-slide-desc">
+                            Explore designer sarees, sportswear, sneakers, and beauty essentials starting from ₹299.
+                        </p>
+                        <a href="/user/products?category=Fashion" class="smart-slide-btn">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Browse Fashion
+                        </a>
+                    </div>
+
+                    <div class="smart-slide-art">
+                        <div class="smart-slide-art-box">
+                            <i class="fa-solid fa-shoe-prints"></i>
+                            <span>Sport & Style</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Home & Living -->
+                <div class="smart-slide-item smart-slide-emerald">
+                    <div class="smart-slide-content">
+                        <div class="smart-slide-badge">
+                            <i class="fa-solid fa-house"></i> HOME & COMFORT
+                        </div>
+                        <h1 class="smart-slide-title">
+                            Smart Home Living
+                        </h1>
+                        <p class="smart-slide-desc">
+                            Upgrade your space with smart Wi-Fi LED lighting, 4K Google TVs, kitchenware, and toys for kids.
+                        </p>
+                        <a href="/user/products?category=Home" class="smart-slide-btn">
+                            <i class="fa-solid fa-tv"></i> Upgrade Home
+                        </a>
+                    </div>
+
+                    <div class="smart-slide-art">
+                        <div class="smart-slide-art-box">
+                            <i class="fa-solid fa-couch"></i>
+                            <span>Living & Decor</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carousel Controls -->
+                <button class="smart-carousel-arrow prev" id="carousel-prev-btn" aria-label="Previous Slide">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button class="smart-carousel-arrow next" id="carousel-next-btn" aria-label="Next Slide">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
+                <!-- Carousel Dots -->
+                <div class="smart-carousel-dots-wrap" id="carousel-dots-container">
+                    <div class="smart-dot-pill active" data-index="0"></div>
+                    <div class="smart-dot-pill" data-index="1"></div>
+                    <div class="smart-dot-pill" data-index="2"></div>
+                    <div class="smart-dot-pill" data-index="3"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             4. FEATURED PRODUCTS SHOWCASE (Live Catalog from DB)
+             ========================================================= -->
+        <section class="smart-showcase-wrap">
+            <div class="smart-showcase-box">
+                <div class="smart-showcase-top">
+                    <div class="smart-showcase-title-wrap">
+                        <div class="smart-showcase-icon-badge">
+                            <i class="fa-solid fa-fire"></i>
+                        </div>
+                        <div>
+                            <h2 class="smart-showcase-title">Featured Products & Top Deals</h2>
+                            <p class="smart-showcase-subtitle">Verified in-stock products with lightning fast shipping</p>
+                        </div>
+                    </div>
+                    <a href="/user/products" class="smart-view-all-link">
+                        VIEW ALL PRODUCTS <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+                    </a>
+                </div>
+
+                {% if products|length == 0 %}
+                    <div style="text-align: center; padding: 3rem 1rem; color: var(--smart-muted);">
+                        <i class="fa-solid fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; color: #cbd5e1; display: block;"></i>
+                        <p style="font-size: 1.1rem; font-weight: 600; color: var(--smart-dark);">No products available at the moment.</p>
+                        <a href="/user/products" class="smart-view-all-link" style="margin-top: 1rem; display: inline-flex;">Browse Store</a>
+                    </div>
+                {% else %}
+                    <div class="smart-product-grid">
+                        {% for product in products %}
+                        <div class="smart-product-card">
+                            <a href="/user/user-view-item/{{ product.product_id }}" class="smart-card-img-container" style="text-decoration: none;">
+                                <img
+                                    src="/static/uploads/product_images/{{ product.image }}"
+                                    alt="{{ product.name }}"
+                                    loading="lazy"
+                                    onerror="this.onerror=null; this.src='https://via.placeholder.com/260x200?text={{ product.name }}';"
+                                >
+                            </a>
+
+                            <span class="smart-card-cat-badge">{{ product.category }}</span>
+
+                            <a href="/user/user-view-item/{{ product.product_id }}" style="text-decoration: none;">
+                                <h3 class="smart-card-name" title="{{ product.name }}">
+                                    {{ product.name }}
+                                </h3>
+                            </a>
+
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem;">
+                                <span class="smart-rating-pill">
+                                    4.3 <i class="fa-solid fa-star" style="font-size: 0.65rem;"></i>
+                                </span>
+                                <span style="font-size: 0.8rem; color: var(--smart-muted); font-weight: 600;">(890+ reviews)</span>
+                            </div>
+
+                            <div class="smart-card-price-row">
+                                <span class="smart-price-main">₹{{ "{:,.0f}".format(product.price) if product.price is number else product.price }}</span>
+                                {% set orig_price = ((product.price|float) * 1.35)|round|int %}
+                                <span class="smart-price-strike">₹{{ "{:,.0f}".format(orig_price) }}</span>
+                                <span class="smart-price-discount">26% off</span>
+                            </div>
+
+                            <div class="smart-delivery-note">
+                                <i class="fa-solid fa-truck-fast" style="color: var(--smart-success);"></i> Free Delivery by <strong>Tomorrow</strong>
+                            </div>
+
+                            <div class="smart-card-btn-grid">
+                                <button
+                                    type="button"
+                                    class="smart-add-cart-action add-cart-btn"
+                                    data-product-id="{{ product.product_id }}"
+                                >
+                                    <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                                </button>
+                                <a href="/user/buy-now/{{ product.product_id }}" class="smart-buy-now-action">
+                                    <i class="fa-solid fa-bolt"></i> Buy Now
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- =========================================================
+             5. TRUST & SECURITY STRIP
+             ========================================================= -->
+        <section class="smart-trust-section">
+            <div class="smart-trust-row">
+                <div class="smart-trust-item">
+                    <div class="smart-trust-icon-box">
+                        <i class="fa-solid fa-truck-fast"></i>
+                    </div>
+                    <div>
+                        <div class="smart-trust-title">Free Express Shipping</div>
+                        <div class="smart-trust-desc">Doorstep delivery across all pincodes</div>
+                    </div>
+                </div>
+
+                <div class="smart-trust-item">
+                    <div class="smart-trust-icon-box" style="background: #ecfdf5; color: var(--smart-success);">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <div class="smart-trust-title">100% Genuine Products</div>
+                        <div class="smart-trust-desc">Verified brand partners with warranty</div>
+                    </div>
+                </div>
+
+                <div class="smart-trust-item">
+                    <div class="smart-trust-icon-box" style="background: #fef3c7; color: #d97706;">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </div>
+                    <div>
+                        <div class="smart-trust-title">7 Days Easy Return</div>
+                        <div class="smart-trust-desc">Hassle-free replacement & refund policy</div>
+                    </div>
+                </div>
+
+                <div class="smart-trust-item">
+                    <div class="smart-trust-icon-box" style="background: #fdf2f8; color: #db2777;">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <div>
+                        <div class="smart-trust-title">100% Secure Checkout</div>
+                        <div class="smart-trust-desc">Razorpay, UPI, Netbanking & Cards</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =========================================================
+         6. SMARTCART FOOTER
+         ========================================================= -->
+    <footer style="background: #0f172a; color: #94a3b8; padding: 3rem 1.5rem 1.5rem; margin-top: auto;">
+        <div style="max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: left; padding-bottom: 2rem; border-bottom: 1px solid #1e293b;">
+            <div>
+                <h4 style="color: #ffffff; font-size: 0.95rem; margin-bottom: 1rem; font-weight: 800;">ABOUT SMARTCART</h4>
+                <p style="font-size: 0.85rem; line-height: 1.8;">Your smart, trusted online shopping platform delivering verified electronics, fashion, home essentials, and lifestyle products with top-tier customer care.</p>
+            </div>
+            <div>
+                <h4 style="color: #ffffff; font-size: 0.95rem; margin-bottom: 1rem; font-weight: 800;">QUICK LINKS</h4>
+                <ul style="list-style: none; font-size: 0.85rem; line-height: 2.1;">
+                    <li><a href="/user-dashboard" style="color: #94a3b8; text-decoration: none;">Home Dashboard</a></li>
+                    <li><a href="/user/products" style="color: #94a3b8; text-decoration: none;">All Products Catalog</a></li>
+                    <li><a href="/user/my-orders" style="color: #94a3b8; text-decoration: none;">My Orders & Invoices</a></li>
+                    <li><a href="/user/cart" style="color: #94a3b8; text-decoration: none;">Shopping Cart</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: #ffffff; font-size: 0.95rem; margin-bottom: 1rem; font-weight: 800;">CUSTOMER HELP</h4>
+                <ul style="list-style: none; font-size: 0.85rem; line-height: 2.1;">
+                    <li><a href="/user/my-orders" style="color: #94a3b8; text-decoration: none;">Track Order Status</a></li>
+                    <li><a href="/user/my-orders" style="color: #94a3b8; text-decoration: none;">Returns & Replacements</a></li>
+                    <li><a href="mailto:support@smartcart.com" style="color: #94a3b8; text-decoration: none;">24x7 Email Support</a></li>
+                    <li><a href="/user/profile" style="color: #94a3b8; text-decoration: none;">Account Settings</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="color: #ffffff; font-size: 0.95rem; margin-bottom: 1rem; font-weight: 800;">SECURE PAYMENTS</h4>
+                <p style="font-size: 0.85rem; line-height: 1.8; margin-bottom: 1rem;">All transactions are encrypted and processed securely via Razorpay payment gateway.</p>
+                <div style="display: flex; gap: 1rem; font-size: 1.5rem; color: #ffffff;">
+                    <i class="fa-brands fa-cc-visa"></i>
+                    <i class="fa-brands fa-cc-mastercard"></i>
+                    <i class="fa-brands fa-google-pay"></i>
+                    <i class="fa-brands fa-apple-pay"></i>
+                </div>
+            </div>
+        </div>
+        <div style="max-width: 1400px; margin: 1.5rem auto 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; font-size: 0.82rem;">
+            <span>&copy; 2026 SmartCart. All Rights Reserved.</span>
+            <span>Crafted for seamless, responsive online shopping.</span>
+        </div>
+    </footer>
+
+    <!-- =========================================================
+         7. SCRIPTS (HERO CAROUSEL, AJAX CART, MOBILE DRAWER)
+         ========================================================= -->
+    <script>
+        // --- 1. Toast Notification ---
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("toast");
+            const toastMsg = document.getElementById("toast-message");
+            const toastIcon = toast.querySelector("i");
+            
+            toastMsg.innerText = message;
+            if (isError) {
+                toastIcon.className = "fa-solid fa-triangle-exclamation";
+                toastIcon.style.color = "var(--danger)";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check";
+                toastIcon.style.color = "var(--success)";
+            }
+            
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        // --- 2. Mobile Drawer Navigation Toggle ---
+        const mobileBtn = document.getElementById("mobile-menu-btn");
+        const mobileDrawer = document.getElementById("mobile-drawer");
+        if (mobileBtn && mobileDrawer) {
+            mobileBtn.addEventListener("click", () => {
+                mobileDrawer.classList.toggle("open");
+                const icon = mobileBtn.querySelector("i");
+                if (mobileDrawer.classList.contains("open")) {
+                    icon.className = "fa-solid fa-xmark";
+                } else {
+                    icon.className = "fa-solid fa-bars";
+                }
+            });
+        }
+
+        // --- 3. Hero Carousel Script ---
+        let currentSlide = 0;
+        const slides = document.querySelectorAll(".smart-slide-item");
+        const dots = document.querySelectorAll(".smart-dot-pill");
+        const totalSlides = slides.length;
+        let slideInterval;
+
+        function showSlide(index) {
+            slides.forEach((s, i) => {
+                s.classList.toggle("active", i === index);
+            });
+            dots.forEach((d, i) => {
+                d.classList.toggle("active", i === index);
+            });
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            let next = (currentSlide + 1) % totalSlides;
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            let prev = (currentSlide - 1 + totalSlides) % totalSlides;
+            showSlide(prev);
+        }
+
+        function startAutoPlay() {
+            slideInterval = setInterval(nextSlide, 4500);
+        }
+
+        function stopAutoPlay() {
+            clearInterval(slideInterval);
+        }
+
+        document.getElementById("carousel-next-btn")?.addEventListener("click", () => {
+            nextSlide();
+            stopAutoPlay();
+            startAutoPlay();
+        });
+
+        document.getElementById("carousel-prev-btn")?.addEventListener("click", () => {
+            prevSlide();
+            stopAutoPlay();
+            startAutoPlay();
+        });
+
+        dots.forEach(dot => {
+            dot.addEventListener("click", () => {
+                const idx = parseInt(dot.getAttribute("data-index"));
+                showSlide(idx);
+                stopAutoPlay();
+                startAutoPlay();
+            });
+        });
+
+        const carouselWrapper = document.getElementById("hero-carousel");
+        if (carouselWrapper) {
+            carouselWrapper.addEventListener("mouseenter", stopAutoPlay);
+            carouselWrapper.addEventListener("mouseleave", startAutoPlay);
+        }
+
+        startAutoPlay();
+
+        // --- 4. AJAX Add to Cart for Database Products ---
+        const addCartButtons = document.querySelectorAll(".add-cart-btn");
+        addCartButtons.forEach(function(button) {
+            button.addEventListener("click", function() {
+                const productId = button.getAttribute("data-product-id");
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
+                button.disabled = true;
+
+                fetch("/user/add-to-cart-ajax/" + productId)
+                .then(function(response) {
+                    if (response.status === 401) {
+                        window.location.href = "/user-login";
+                        return null;
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+
+                    if (!data) return;
+
+                    if (data.error) {
+                        showToast(data.error, true);
+                        return;
+                    }
+
+                    const badge = document.getElementById("cart-nav-count");
+                    const bottomBadge = document.getElementById("bottom-cart-count");
+                    if (badge) {
+                        let current = parseInt(badge.innerText) || 0;
+                        badge.innerText = current + 1;
+                    }
+                    if (bottomBadge) {
+                        let current = parseInt(bottomBadge.innerText) || 0;
+                        bottomBadge.innerText = current + 1;
+                    }
+                })
+                .catch(function(error) {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                    console.log("Error:", error);
+                    showToast("Failed to add product to cart.", true);
+                });
+            });
+        });
+    </script>
+
+    <!-- Mobile Sticky Bottom Navigation Bar (Flipkart Style) -->
+    <nav class="smart-bottom-bar">
+        <a href="/user-dashboard" class="bottom-bar-item active">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/user/products" class="bottom-bar-item">
+            <i class="fa-solid fa-store"></i>
+            <span>Products</span>
+        </a>
+        <a href="/user/my-orders" class="bottom-bar-item">
+            <i class="fa-solid fa-box-open"></i>
+            <span>Orders</span>
+        </a>
+        <a href="/user/profile" class="bottom-bar-item">
+            <i class="fa-regular fa-user"></i>
+            <span>Account</span>
+        </a>
+        <a href="/user/cart" class="bottom-bar-item">
+            <div class="bottom-cart-badge-wrap">
+                <i class="fa-solid fa-cart-shopping"></i>
+                {% set cart_len = session.get('cart')|length if session.get('cart') else 0 %}
+                {% if cart_len > 0 %}
+                <span class="bottom-cart-count" id="bottom-cart-count">{{ cart_len }}</span>
+                {% endif %}
+            </div>
+            <span>Cart</span>
+        </a>
+    </nav>
+
+    <!-- Footer -->
+    <footer class="smart-footer">
+        <p>&copy; 2026 SmartCart. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

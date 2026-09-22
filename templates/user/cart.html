@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Shopping Cart - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header class="smart-navbar">
+        <a href="/user-dashboard" class="brand-logo">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>SmartCart</span>
+        </a>
+
+        <ul class="nav-links desktop-only-nav">
+            <li>
+                <a href="/user-dashboard" class="nav-link">
+                    <i class="fa-solid fa-house"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="/user/products" class="nav-link">
+                    <i class="fa-solid fa-store"></i> Products
+                </a>
+            </li>
+            <li>
+                <a href="/user/my-orders" class="nav-link">
+                    <i class="fa-solid fa-box-open"></i> My Orders
+                </a>
+            </li>
+            <li>
+                <a href="/user/cart" class="cart-link-btn active">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>Cart</span>
+                    <span class="cart-count-badge">{{ session.get('cart')|length if session.get('cart') else 0 }}</span>
+                </a>
+            </li>
+            <li>
+                <a href="/user/profile" class="nav-link">
+                    <i class="fa-solid fa-user"></i> Profile
+                </a>
+            </li>
+            <li>
+                <a href="/user-logout" class="nav-link" style="color: var(--danger);">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </a>
+            </li>
+        </ul>
+
+        <div class="mobile-header-actions" style="display: none;">
+            <a href="/user/products" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-store"></i> Store
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-wrapper">
+
+        <!-- Checkout Stepper -->
+        <div class="checkout-stepper">
+            <div class="step-item active">
+                <div class="step-num">1</div>
+                <span>Shopping Cart</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item">
+                <div class="step-num">2</div>
+                <span>Delivery Address</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item">
+                <div class="step-num">3</div>
+                <span>Payment</span>
+            </div>
+        </div>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category if category != 'message' else 'info' }}">
+                <div class="flash-alert-content">
+                  <i class="fa-solid fa-circle-info flash-alert-icon"></i>
+                  <span>{{ message }}</span>
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        {% if not cart %}
+            <div class="card glass-card" style="text-align: center; padding: 4rem 2rem; max-width: 550px; margin: 2rem auto;">
+                <div style="font-size: 3.5rem; color: var(--text-light); margin-bottom: 1.25rem;">
+                    <i class="fa-solid fa-cart-arrow-down"></i>
+                </div>
+                <h2 style="font-weight: 800; margin-bottom: 0.5rem; color: var(--text-main);">Your Cart is Empty</h2>
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">Looks like you haven't added anything to your cart yet.</p>
+                <div style="display: flex; justify-content: center;">
+                    <a href="/user/products" class="btn btn-primary btn-lg">
+                        <i class="fa-solid fa-bag-shopping"></i> Start Shopping &rarr;
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <form method="POST" action="/user/address">
+                <div class="cart-layout">
+                    
+                    <!-- Left: Cart Items -->
+                    <div>
+                        <div class="select-all-bar">
+                            <input type="checkbox" id="select-all">
+                            <label for="select-all" style="cursor: pointer; font-weight: 700; color: var(--text-main);">Select All Items</label>
+                            <span style="font-size: 0.85rem; color: var(--text-muted); margin-left: auto;">
+                                Choose items for checkout
+                            </span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 48px;">Select</th>
+                                        <th>Product</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Subtotal</th>
+                                        <th style="text-align: right;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for pid, item in cart.items() %}
+                                    <tr id="row-{{ pid }}">
+                                        <!-- Checkbox -->
+                                        <td>
+                                            <input
+                                                type="checkbox"
+                                                class="product-checkbox"
+                                                name="selected_products"
+                                                value="{{ pid }}"
+                                                data-id="{{ pid }}"
+                                                data-price="{{ item.price }}"
+                                            >
+                                        </td>
+
+                                        <!-- Product info -->
+                                        <td>
+                                            <div class="table-product-cell">
+                                                <img
+                                                    src="/static/uploads/product_images/{{ item.image }}"
+                                                    alt="{{ item.name }}"
+                                                    class="table-thumbnail"
+                                                >
+                                                <div>
+                                                    <a href="/user/user-view-item/{{ pid }}" style="font-weight: 700; color: var(--text-main); display: block; line-height: 1.35;">
+                                                        {{ item.name }}
+                                                    </a>
+                                                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+                                                        Item Code: #{{ pid }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <!-- Price -->
+                                        <td style="font-weight: 700; color: var(--text-main); white-space: nowrap;">
+                                            ₹{{ item.price }}
+                                        </td>
+
+                                        <!-- Quantity Controls -->
+                                        <td>
+                                            <div class="qty-stepper">
+                                                <button
+                                                    type="button"
+                                                    class="qty-btn decrease-btn"
+                                                    data-id="{{ pid }}"
+                                                    title="Decrease quantity"
+                                                >
+                                                    <i class="fa-solid fa-minus" style="font-size: 0.75rem;"></i>
+                                                </button>
+                                                
+                                                <span id="quantity-{{ pid }}" class="qty-val">
+                                                    {{ item.quantity }}
+                                                </span>
+
+                                                <button
+                                                    type="button"
+                                                    class="qty-btn increase-btn"
+                                                    data-id="{{ pid }}"
+                                                    title="Increase quantity"
+                                                >
+                                                    <i class="fa-solid fa-plus" style="font-size: 0.75rem;"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+
+                                        <!-- Row Total -->
+                                        <td style="font-weight: 800; color: var(--primary); white-space: nowrap;">
+                                            ₹<span id="item-total-{{ pid }}">{{ item.price * item.quantity }}</span>
+                                        </td>
+
+                                        <!-- Action -->
+                                        <td style="text-align: right;">
+                                            <a
+                                                href="/user/cart/remove/{{ pid }}"
+                                                class="btn btn-outline btn-sm"
+                                                style="color: var(--danger); border-color: var(--danger-light); padding: 0.4rem 0.6rem;"
+                                                title="Remove item from cart"
+                                            >
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style="margin-top: 1.25rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                            <a href="/user/products" class="btn btn-secondary">
+                                <i class="fa-solid fa-arrow-left"></i> Continue Shopping
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Right: Order Summary Sidebar -->
+                    <div>
+                        <div class="order-summary-card">
+                            <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fa-solid fa-receipt" style="color: var(--primary);"></i> Price Details
+                            </h3>
+
+                            <div class="summary-row">
+                                <span>Selected Items Total</span>
+                                <span>₹<span id="selected-subtotal">0.00</span></span>
+                            </div>
+
+                            <div class="summary-row">
+                                <span>Estimated Delivery</span>
+                                <span style="color: var(--success); font-weight: 700;"><i class="fa-solid fa-bolt"></i> FREE</span>
+                            </div>
+
+                            <div class="summary-row total">
+                                <span>Total Amount:</span>
+                                <span class="highlight">₹<span id="selected-total">0.00</span></span>
+                            </div>
+
+                            <div style="margin-top: 1.5rem;">
+                                <button
+                                    type="submit"
+                                    id="proceed-btn"
+                                    class="btn btn-primary btn-block btn-lg"
+                                    disabled
+                                    style="box-shadow: 0 4px 14px var(--primary-glow); font-size: 1rem; padding: 0.9rem 1rem;"
+                                >
+                                    Proceed to Delivery &rarr;
+                                </button>
+                            </div>
+
+                            <div style="margin-top: 1.15rem; text-align: center; font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                                <i class="fa-solid fa-shield-check" style="color: var(--success);"></i> 100% Safe & Secure Checkout
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        {% endif %}
+
+    </main>
+
+    <!-- Mobile Sticky Bottom Navigation Bar (Flipkart Style) -->
+    <nav class="smart-bottom-bar">
+        <a href="/user-dashboard" class="bottom-bar-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/user/products" class="bottom-bar-item">
+            <i class="fa-solid fa-store"></i>
+            <span>Products</span>
+        </a>
+        <a href="/user/my-orders" class="bottom-bar-item">
+            <i class="fa-solid fa-box-open"></i>
+            <span>Orders</span>
+        </a>
+        <a href="/user/profile" class="bottom-bar-item">
+            <i class="fa-regular fa-user"></i>
+            <span>Account</span>
+        </a>
+        <a href="/user/cart" class="bottom-bar-item active">
+            <div class="bottom-cart-badge-wrap">
+                <i class="fa-solid fa-cart-shopping"></i>
+                {% set cart_len = session.get('cart')|length if session.get('cart') else 0 %}
+                {% if cart_len > 0 %}
+                <span class="bottom-cart-count">{{ cart_len }}</span>
+                {% endif %}
+            </div>
+            <span>Cart</span>
+        </a>
+    </nav>
+
+    <!-- Footer -->
+    <footer class="smart-footer">
+        <p>&copy; 2026 SmartCart. All rights reserved.</p>
+    </footer>
+
+    <!-- Cart Scripts -->
+    <script>
+        const checkboxes = document.querySelectorAll(".product-checkbox");
+        const selectAll = document.getElementById("select-all");
+        const selectedTotal = document.getElementById("selected-total");
+        const selectedSubtotal = document.getElementById("selected-subtotal");
+        const proceedButton = document.getElementById("proceed-btn");
+
+        /* CALCULATE SELECTED GRAND TOTAL */
+        function calculateSelectedTotal() {
+            let total = 0;
+            let selectedCount = 0;
+
+            document.querySelectorAll(".product-checkbox").forEach(function(checkbox) {
+                if (checkbox.checked) {
+                    const pid = checkbox.getAttribute("data-id");
+                    const itemTotalElement = document.getElementById("item-total-" + pid);
+                    if (itemTotalElement) {
+                        const itemTotal = parseFloat(itemTotalElement.innerText);
+                        total += itemTotal;
+                        selectedCount++;
+                    }
+                }
+            });
+
+            const formattedTotal = total.toFixed(2);
+            if (selectedTotal) selectedTotal.innerText = formattedTotal;
+            if (selectedSubtotal) selectedSubtotal.innerText = formattedTotal;
+            if (proceedButton) proceedButton.disabled = (selectedCount === 0);
+
+            if (selectAll) {
+                const allCheckboxes = document.querySelectorAll(".product-checkbox");
+                selectAll.checked = allCheckboxes.length > 0 && selectedCount === allCheckboxes.length;
+            }
+        }
+
+        /* INDIVIDUAL CHECKBOX CHANGE */
+        document.querySelectorAll(".product-checkbox").forEach(function(checkbox) {
+            checkbox.addEventListener("change", calculateSelectedTotal);
+        });
+
+        /* SELECT ALL TOGGLE */
+        if (selectAll) {
+            selectAll.addEventListener("change", function() {
+                document.querySelectorAll(".product-checkbox").forEach(function(checkbox) {
+                    checkbox.checked = selectAll.checked;
+                });
+                calculateSelectedTotal();
+            });
+        }
+
+        /* INCREASE QUANTITY */
+        document.querySelectorAll(".increase-btn").forEach(function(button) {
+            button.addEventListener("click", function() {
+                const pid = button.getAttribute("data-id");
+
+                fetch("/user/cart/increase-ajax/" + pid)
+                .then(function(response) {
+                    if (response.status === 401) {
+                        window.location.href = "/user-login";
+                        return null;
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (!data) return;
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+
+                    const qtyEl = document.getElementById("quantity-" + pid);
+                    const totalEl = document.getElementById("item-total-" + pid);
+                    if (qtyEl) qtyEl.innerText = data.quantity;
+                    if (totalEl) totalEl.innerText = parseFloat(data.item_total).toFixed(2);
+
+                    calculateSelectedTotal();
+                })
+                .catch(function(error) {
+                    console.log("Error:", error);
+                });
+            });
+        });
+
+        /* DECREASE QUANTITY */
+        document.querySelectorAll(".decrease-btn").forEach(function(button) {
+            button.addEventListener("click", function() {
+                const pid = button.getAttribute("data-id");
+
+                fetch("/user/cart/decrease-ajax/" + pid)
+                .then(function(response) {
+                    if (response.status === 401) {
+                        window.location.href = "/user-login";
+                        return null;
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (!data) return;
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+
+                    if (data.removed) {
+                        const row = document.getElementById("row-" + pid);
+                        if (row) row.remove();
+                        calculateSelectedTotal();
+                        if (document.querySelectorAll(".product-checkbox").length === 0) {
+                            window.location.reload();
+                        }
+                        return;
+                    }
+
+                    const qtyEl = document.getElementById("quantity-" + pid);
+                    const totalEl = document.getElementById("item-total-" + pid);
+                    if (qtyEl) qtyEl.innerText = data.quantity;
+                    if (totalEl) totalEl.innerText = parseFloat(data.item_total).toFixed(2);
+
+                    calculateSelectedTotal();
+                })
+                .catch(function(error) {
+                    console.log("Error:", error);
+                });
+            });
+        });
+
+        /* Initial total run */
+        calculateSelectedTotal();
+    </script>
+
+</body>
+</html>

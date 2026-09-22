@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>SmartCart Invoice - #{{ order.order_id }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #1e293b;
+            font-size: 13px;
+            line-height: 1.5;
+            padding: 20px;
+            background-color: #f8fafc;
+        }
+
+        .invoice-box {
+            max-width: 800px;
+            margin: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-table {
+            width: 100%;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #4f46e5;
+            padding-bottom: 20px;
+        }
+
+        .brand-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: #4f46e5;
+            margin: 0;
+        }
+
+        .invoice-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0f172a;
+            text-align: right;
+            margin: 0;
+        }
+
+        .meta-table {
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .meta-col {
+            vertical-align: top;
+            width: 50%;
+        }
+
+        .section-heading {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            min-width: 500px;
+        }
+
+        .items-table th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            text-align: left;
+        }
+
+        .items-table td {
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+
+        .total-box {
+            width: 100%;
+            margin-top: 15px;
+            text-align: right;
+        }
+
+        .grand-total-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #4f46e5;
+            padding: 10px 16px;
+            background-color: #f8fafc;
+            display: inline-block;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .invoice-box {
+                padding: 16px;
+            }
+            .brand-title {
+                font-size: 20px;
+            }
+            .invoice-title {
+                font-size: 16px;
+            }
+            .meta-table tr {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+            .meta-col {
+                width: 100% !important;
+                text-align: left !important;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .invoice-box {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="invoice-box">
+    
+    <!-- HEADER -->
+    <table class="header-table">
+        <tr>
+            <td>
+                <div class="brand-title">SmartCart</div>
+                <div style="color: #64748b; font-size: 12px; margin-top: 4px;">Smart Online Shopping Platform</div>
+            </td>
+            <td style="text-align: right;">
+                <div class="invoice-title">TAX INVOICE</div>
+                <div style="color: #64748b; font-size: 12px; margin-top: 4px;">Invoice #: INV-{{ order.order_id }}</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- ORDER & CUSTOMER METADATA -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-col">
+                <div class="section-heading">Billed To</div>
+                <div><strong>User Account ID:</strong> #{{ order.user_id }}</div>
+                <div><strong>Payment Status:</strong> {{ order.payment_status }}</div>
+            </td>
+            <td class="meta-col" style="text-align: right;">
+                <div class="section-heading">Order Details</div>
+                <div><strong>Order ID:</strong> #{{ order.order_id }}</div>
+                <div><strong>Order Date:</strong> {{ order.created_at }}</div>
+                <div><strong>Payment ID:</strong> {{ order.razorpay_payment_id }}</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- PURCHASED ITEMS -->
+    <div class="table-wrap">
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th style="width: 50%;">Product Description</th>
+                    <th style="width: 15%; text-align: center;">Quantity</th>
+                    <th style="width: 15%; text-align: right;">Unit Price</th>
+                    <th style="width: 20%; text-align: right;">Total Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for it in items %}
+                <tr>
+                    <td><strong>{{ it.product_name }}</strong></td>
+                    <td style="text-align: center;">{{ it.quantity }}</td>
+                    <td style="text-align: right;">₹{{ it.price }}</td>
+                    <td style="text-align: right;"><strong>₹{{ it.price * it.quantity }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- TOTAL -->
+    <div class="total-box">
+        <div class="grand-total-text">
+            Grand Total Paid: ₹{{ order.amount }}
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <p>Thank you for shopping with <strong>SmartCart</strong>! For support, contact support@smartcart.com</p>
+        <p>This is a computer-generated invoice and does not require a physical signature.</p>
+    </div>
+
+</div>
+
+</body>
+</html>

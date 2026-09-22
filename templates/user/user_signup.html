@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="auth-page">
+
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo-badge">
+                <i class="fa-solid fa-user-plus"></i>
+            </div>
+            <h2 class="auth-title">Create Account</h2>
+            <p class="auth-subtitle">Join SmartCart and start shopping today</p>
+        </div>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category if category != 'message' else 'danger' }}">
+                <div class="flash-alert-content">
+                  <i class="fa-solid fa-circle-exclamation flash-alert-icon"></i>
+                  <span>{{ message }}</span>
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/user-signup">
+            <div class="form-group">
+                <label class="form-label">Full Name <span class="req">*</span></label>
+                <div class="input-wrapper">
+                    <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+                    <i class="fa-solid fa-user input-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email Address <span class="req">*</span></label>
+                <div class="input-wrapper">
+                    <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
+                    <i class="fa-solid fa-envelope input-icon"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+                <i class="fa-solid fa-paper-plane"></i> Send OTP Verification
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="/user-login">Login here</a></p>
+        </div>
+    </div>
+
+</body>
+</html>

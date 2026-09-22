@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header class="smart-navbar">
+        <a href="/user-dashboard" class="brand-logo">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>SmartCart</span>
+        </a>
+
+        <ul class="nav-links">
+            <li>
+                <a href="/user-dashboard" class="nav-link">
+                    <i class="fa-solid fa-house"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="/user/products" class="nav-link">
+                    <i class="fa-solid fa-store"></i> Products
+                </a>
+            </li>
+            <li>
+                <a href="/user/my-orders" class="nav-link">
+                    <i class="fa-solid fa-box-open"></i> My Orders
+                </a>
+            </li>
+            <li>
+                <a href="/user/cart" class="cart-link-btn">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>Cart</span>
+                    <span class="cart-count-badge">{{ session.get('cart')|length if session.get('cart') else 0 }}</span>
+                </a>
+            </li>
+            <li>
+                <a href="/user/profile" class="nav-link active">
+                    <i class="fa-solid fa-user"></i> Profile
+                </a>
+            </li>
+            <li>
+                <a href="/user-logout" class="nav-link" style="color: var(--danger);">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-wrapper page-wrapper-narrow">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category if category != 'message' else 'success' }}">
+                <div class="flash-alert-content">
+                  <i class="fa-solid fa-circle-check flash-alert-icon"></i>
+                  <span>{{ message }}</span>
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div class="card glass-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fa-solid fa-user-pen" style="color: var(--primary);"></i> Account Profile
+                </h2>
+                <a href="/user-dashboard" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-arrow-left"></i> Dashboard
+                </a>
+            </div>
+
+            <!-- Current Profile Image Avatar Preview -->
+            <div class="profile-avatar-wrapper">
+                {% if user.profile_image %}
+                    <img src="/static/uploads/user_profiles/{{ user.profile_image }}" alt="{{ user.name }}" class="profile-avatar-large">
+                {% else %}
+                    <div class="profile-avatar-placeholder">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                {% endif %}
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-top: 0.75rem; color: var(--text-main);">{{ user.name }}</h3>
+                <p style="font-size: 0.88rem; color: var(--text-muted);">{{ user.email }}</p>
+            </div>
+
+            <form method="POST" action="/user/profile" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label">Full Name <span class="req">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" name="name" class="form-control" value="{{ user.name }}" required>
+                        <i class="fa-solid fa-user input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address <span class="req">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">New Password <span style="font-size: 0.8rem; color: var(--text-muted);">(Leave blank to keep current)</span></label>
+                    <div class="input-wrapper">
+                        <input type="password" name="password" class="form-control" placeholder="••••••••">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Upload New Profile Picture (Optional)</label>
+                    <input type="file" name="profile_image" class="form-control" accept="image/*">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1.5rem;">
+                    <i class="fa-solid fa-floppy-disk"></i> Update Profile
+                </button>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- Mobile Sticky Bottom Navigation Bar (Flipkart Style) -->
+    <nav class="smart-bottom-bar">
+        <a href="/user-dashboard" class="bottom-bar-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/user/products" class="bottom-bar-item">
+            <i class="fa-solid fa-store"></i>
+            <span>Products</span>
+        </a>
+        <a href="/user/my-orders" class="bottom-bar-item">
+            <i class="fa-solid fa-box-open"></i>
+            <span>Orders</span>
+        </a>
+        <a href="/user/profile" class="bottom-bar-item active">
+            <i class="fa-regular fa-user"></i>
+            <span>Account</span>
+        </a>
+        <a href="/user/cart" class="bottom-bar-item">
+            <div class="bottom-cart-badge-wrap">
+                <i class="fa-solid fa-cart-shopping"></i>
+                {% set cart_len = session.get('cart')|length if session.get('cart') else 0 %}
+                {% if cart_len > 0 %}
+                <span class="bottom-cart-count">{{ cart_len }}</span>
+                {% endif %}
+            </div>
+            <span>Cart</span>
+        </a>
+    </nav>
+
+    <!-- Footer -->
+    <footer class="smart-footer">
+        <p>&copy; 2026 SmartCart. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

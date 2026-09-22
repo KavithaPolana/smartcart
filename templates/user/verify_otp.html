@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="auth-page">
+
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo-badge">
+                <i class="fa-solid fa-key"></i>
+            </div>
+            <h2 class="auth-title">Verify OTP</h2>
+            <p class="auth-subtitle">Enter the 6-digit code sent to your email</p>
+        </div>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category if category != 'message' else 'danger' }}">
+                <div class="flash-alert-content">
+                  <i class="fa-solid fa-circle-exclamation flash-alert-icon"></i>
+                  <span>{{ message }}</span>
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/user-verify-otp">
+            <div class="form-group">
+                <label class="form-label">Enter 6-Digit OTP <span class="req">*</span></label>
+                <div class="input-wrapper">
+                    <input type="text" name="otp" class="form-control" placeholder="123456" maxlength="6" style="letter-spacing: 4px; font-weight: 700; text-align: center; font-size: 1.25rem;" required>
+                    <i class="fa-solid fa-shield-halved input-icon"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Create Password <span class="req">*</span></label>
+                <div class="input-wrapper">
+                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                    <i class="fa-solid fa-lock input-icon"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1.25rem;">
+                <i class="fa-solid fa-check-circle"></i> Verify & Register
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p><a href="/user-signup"><i class="fa-solid fa-arrow-left"></i> Change Email / Go Back</a></p>
+        </div>
+    </div>
+
+</body>
+</html>

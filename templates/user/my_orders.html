@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header class="smart-navbar">
+        <a href="/user-dashboard" class="brand-logo">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>SmartCart</span>
+        </a>
+
+        <ul class="nav-links">
+            <li>
+                <a href="/user-dashboard" class="nav-link">
+                    <i class="fa-solid fa-house"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="/user/products" class="nav-link">
+                    <i class="fa-solid fa-store"></i> Products
+                </a>
+            </li>
+            <li>
+                <a href="/user/my-orders" class="nav-link active">
+                    <i class="fa-solid fa-box-open"></i> My Orders
+                </a>
+            </li>
+            <li>
+                <a href="/user/cart" class="cart-link-btn">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>Cart</span>
+                    <span class="cart-count-badge">{{ session.get('cart')|length if session.get('cart') else 0 }}</span>
+                </a>
+            </li>
+            <li>
+                <a href="/user/profile" class="nav-link">
+                    <i class="fa-solid fa-user"></i> Profile
+                </a>
+            </li>
+            <li>
+                <a href="/user-logout" class="nav-link" style="color: var(--danger);">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-wrapper page-wrapper-medium">
+
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">
+                    <i class="fa-solid fa-boxes-packing" style="color: var(--primary);"></i> My Orders
+                </h1>
+                <p class="page-subtitle">Track your purchase history and access receipts</p>
+            </div>
+            <div>
+                <a href="/user/products" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-bag-shopping"></i> Continue Shopping
+                </a>
+            </div>
+        </div>
+
+        {% if orders|length == 0 %}
+            <div class="card" style="text-align: center; padding: 4rem 2rem;">
+                <div style="font-size: 3.5rem; color: var(--text-light); margin-bottom: 1.25rem;">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <h2 style="font-weight: 800; margin-bottom: 0.5rem;">No Orders Yet</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.75rem;">You haven't placed any orders yet. Discover our catalog today!</p>
+                <a href="/user/products" class="btn btn-primary btn-lg">
+                    <i class="fa-solid fa-bag-shopping"></i> Start Shopping
+                </a>
+            </div>
+        {% else %}
+            <div class="order-list">
+                {% for order in orders %}
+                <div class="order-card-modern">
+                    <div class="order-card-top">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span class="order-card-id">Order #{{ order.order_id }}</span>
+                            <span class="badge badge-success">
+                                <i class="fa-solid fa-check"></i> {{ order.payment_status }}
+                            </span>
+                        </div>
+                        <div style="font-size: 0.88rem; color: var(--text-muted);">
+                            <i class="fa-regular fa-calendar"></i> {{ order.created_at }}
+                        </div>
+                    </div>
+
+                    <div style="margin: 1.25rem 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <span style="font-size: 0.85rem; color: var(--text-muted); display: block;">Total Paid</span>
+                            <span style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">₹{{ order.amount }}</span>
+                        </div>
+
+                        <div class="order-card-actions">
+                            <a href="/user/order-success/{{ order.order_id }}" class="btn btn-secondary btn-sm">
+                                <i class="fa-solid fa-eye"></i> View Order Details
+                            </a>
+                            <a href="/user/download-invoice/{{ order.order_id }}" class="btn btn-success btn-sm">
+                                <i class="fa-solid fa-file-arrow-down"></i> Download Invoice
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+    </main>
+
+    <!-- Mobile Sticky Bottom Navigation Bar (Flipkart Style) -->
+    <nav class="smart-bottom-bar">
+        <a href="/user-dashboard" class="bottom-bar-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/user/products" class="bottom-bar-item">
+            <i class="fa-solid fa-store"></i>
+            <span>Products</span>
+        </a>
+        <a href="/user/my-orders" class="bottom-bar-item active">
+            <i class="fa-solid fa-box-open"></i>
+            <span>Orders</span>
+        </a>
+        <a href="/user/profile" class="bottom-bar-item">
+            <i class="fa-regular fa-user"></i>
+            <span>Account</span>
+        </a>
+        <a href="/user/cart" class="bottom-bar-item">
+            <div class="bottom-cart-badge-wrap">
+                <i class="fa-solid fa-cart-shopping"></i>
+                {% set cart_len = session.get('cart')|length if session.get('cart') else 0 %}
+                {% if cart_len > 0 %}
+                <span class="bottom-cart-count">{{ cart_len }}</span>
+                {% endif %}
+            </div>
+            <span>Cart</span>
+        </a>
+    </nav>
+
+    <!-- Footer -->
+    <footer class="smart-footer">
+        <p>&copy; 2026 SmartCart. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

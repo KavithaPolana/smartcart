@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Products - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <header class="smart-navbar">
+        <a href="/user-dashboard" class="brand-logo">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>SmartCart</span>
+        </a>
+
+        <ul class="nav-links">
+            <li>
+                <a href="/user-dashboard" class="nav-link">
+                    <i class="fa-solid fa-house"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="/user/products" class="nav-link active">
+                    <i class="fa-solid fa-store"></i> Products
+                </a>
+            </li>
+            <li>
+                <a href="/user/my-orders" class="nav-link">
+                    <i class="fa-solid fa-box-open"></i> My Orders
+                </a>
+            </li>
+            <li>
+                <a href="/user/cart" class="cart-link-btn" id="cart-nav-btn">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>Cart</span>
+                    <span class="cart-count-badge" id="cart-nav-count">{{ session.get('cart')|length if session.get('cart') else 0 }}</span>
+                </a>
+            </li>
+            <li>
+                <a href="/user/profile" class="nav-link">
+                    <i class="fa-solid fa-user"></i> Profile
+                </a>
+            </li>
+            <li>
+                <a href="/user-logout" class="nav-link" style="color: var(--danger);">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </header>
+
+    <!-- Toast Notification Container -->
+    <div id="toast" class="toast-notification">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toast-message">Item added to cart!</span>
+    </div>
+
+    <!-- Main Content -->
+    <main class="page-wrapper">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">
+                    <i class="fa-solid fa-bag-shopping" style="color: var(--primary);"></i> Explore Store
+                </h1>
+                <p class="page-subtitle">Discover our premium range of handpicked products</p>
+            </div>
+            <div>
+                <a href="/user/cart" class="btn btn-primary">
+                    <i class="fa-solid fa-cart-shopping"></i> View Cart ({{ session.get('cart')|length if session.get('cart') else 0 }})
+                </a>
+            </div>
+        </div>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category if category != 'message' else 'success' }}">
+                <div class="flash-alert-content">
+                  <i class="fa-solid fa-circle-check flash-alert-icon"></i>
+                  <span>{{ message }}</span>
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Filter & Search Toolbar -->
+        <div class="filter-bar">
+            <div class="filter-forms-wrapper">
+                <form method="GET" action="/user/products" class="search-form">
+                    <div class="input-wrapper" style="flex: 1;">
+                        <input
+                            type="text"
+                            name="search"
+                            class="form-control"
+                            placeholder="Search products by name..."
+                            value="{{ request.args.get('search', '') }}"
+                        >
+                        <i class="fa-solid fa-magnifying-glass input-icon"></i>
+                    </div>
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fa-solid fa-search"></i> Search
+                    </button>
+                </form>
+
+                <form method="GET" action="/user/products" class="category-form">
+                    <select name="category" class="form-control" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                            <option
+                                value="{{ cat.category }}"
+                                {% if request.args.get('category') == cat.category %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ cat.category }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if request.args.get('search') %}
+                        <input type="hidden" name="search" value="{{ request.args.get('search') }}">
+                    {% endif %}
+                </form>
+
+                {% if request.args.get('search') or request.args.get('category') %}
+                    <a href="/user/products" class="btn btn-outline btn-sm">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Filter
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        {% if products|length == 0 %}
+            <div class="card" style="text-align: center; padding: 4rem 2rem;">
+                <div style="font-size: 3rem; color: var(--text-light); margin-bottom: 1rem;">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <h3>No Products Found</h3>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Try adjusting your search terms or category filters.</p>
+                <a href="/user/products" class="btn btn-primary" style="margin-top: 1.5rem;">
+                    View All Products
+                </a>
+            </div>
+        {% else %}
+            <div class="product-grid">
+                {% for product in products %}
+                <div class="product-card">
+                    <div class="product-image-container">
+                        <span class="product-category-tag">{{ product.category }}</span>
+                        <img
+                            src="/static/uploads/product_images/{{ product.image }}"
+                            alt="{{ product.name }}"
+                            loading="lazy"
+                        >
+                    </div>
+
+                    <div class="product-body">
+                        <h3 class="product-name" title="{{ product.name }}">
+                            {{ product.name }}
+                        </h3>
+
+                        <div class="product-price-row">
+                            <span class="product-price">₹{{ product.price }}</span>
+                        </div>
+
+                        <div class="product-actions">
+                            <button
+                                type="button"
+                                class="btn btn-primary btn-block add-cart-btn"
+                                data-product-id="{{ product.product_id }}"
+                            >
+                                <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                            </button>
+
+                            <div class="product-actions-split">
+                                <a href="/user/buy-now/{{ product.product_id }}" class="btn btn-success btn-sm">
+                                    <i class="fa-solid fa-bolt"></i> Buy Now
+                                </a>
+                                <a href="/user/user-view-item/{{ product.product_id }}" class="btn btn-secondary btn-sm">
+                                    <i class="fa-solid fa-eye"></i> Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="smart-footer">
+        <p>&copy; 2026 SmartCart. All rights reserved.</p>
+    </footer>
+
+    <!-- AJAX Script for Cart Integration -->
+    <script>
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("toast");
+            const toastMsg = document.getElementById("toast-message");
+            const toastIcon = toast.querySelector("i");
+            
+            toastMsg.innerText = message;
+            if (isError) {
+                toastIcon.className = "fa-solid fa-triangle-exclamation";
+                toastIcon.style.color = "var(--danger)";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check";
+                toastIcon.style.color = "var(--success)";
+            }
+            
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        const addCartButtons = document.querySelectorAll(".add-cart-btn");
+
+        addCartButtons.forEach(function(button) {
+            button.addEventListener("click", function() {
+                const productId = button.getAttribute("data-product-id");
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
+                button.disabled = true;
+
+                fetch("/user/add-to-cart-ajax/" + productId)
+                .then(function(response) {
+                    if (response.status === 401) {
+                        window.location.href = "/user-login";
+                        return null;
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+
+                    if (!data) return;
+
+                    if (data.error) {
+                        showToast(data.error, true);
+                        return;
+                    }
+
+                    showToast("✔ " + data.message);
+                    
+                    // Increment badge count if cart counter exists
+                    const badge = document.getElementById("cart-nav-count");
+                    const bottomBadge = document.getElementById("bottom-cart-count");
+                    if (badge) {
+                        let current = parseInt(badge.innerText) || 0;
+                        badge.innerText = current + 1;
+                    }
+                    if (bottomBadge) {
+                        let current = parseInt(bottomBadge.innerText) || 0;
+                        bottomBadge.innerText = current + 1;
+                    }
+                })
+                .catch(function(error) {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                    console.log("Error:", error);
+                    showToast("Failed to add product to cart.", true);
+                });
+            });
+        });
+    </script>
+
+    <!-- Mobile Sticky Bottom Navigation Bar (Flipkart Style) -->
+    <nav class="smart-bottom-bar">
+        <a href="/user-dashboard" class="bottom-bar-item">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+        <a href="/user/products" class="bottom-bar-item active">
+            <i class="fa-solid fa-store"></i>
+            <span>Products</span>
+        </a>
+        <a href="/user/my-orders" class="bottom-bar-item">
+            <i class="fa-solid fa-box-open"></i>
+            <span>Orders</span>
+        </a>
+        <a href="/user/profile" class="bottom-bar-item">
+            <i class="fa-regular fa-user"></i>
+            <span>Account</span>
+        </a>
+        <a href="/user/cart" class="bottom-bar-item">
+            <div class="bottom-cart-badge-wrap">
+                <i class="fa-solid fa-cart-shopping"></i>
+                {% set cart_len = session.get('cart')|length if session.get('cart') else 0 %}
+                {% if cart_len > 0 %}
+                <span class="bottom-cart-count" id="bottom-cart-count">{{ cart_len }}</span>
+                {% endif %}
+            </div>
+            <span>Cart</span>
+        </a>
+    </nav>
+
+    <!-- Footer -->
+    <footer class="smart-footer">
+        <p>&copy; 2026 SmartCart. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
