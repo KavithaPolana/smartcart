@@ -19,21 +19,18 @@ from werkzeug.utils import secure_filename
 try:
     import config
 except ImportError:
-    try:
-        import config_example as config
-    except ImportError:
-        class ConfigFallback:
-            SECRET_KEY = "abcdefg"
-            BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-            DB_PATH = os.path.join(BASE_DIR, "smartcart.db")
-            MAIL_SERVER = 'smtp.gmail.com'
-            MAIL_PORT = 587
-            MAIL_USE_TLS = True
-            MAIL_USERNAME = 'kavithapolana19@gmail.com'
-            MAIL_PASSWORD = ''
-            RAZORPAY_KEY_ID = 'rzp_test_Tbw0XTMtbWT5rb'
-            RAZORPAY_KEY_SECRET = ''
-        config = ConfigFallback()
+    class ConfigFallback:
+        SECRET_KEY = "abcdefg"
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        DB_PATH = os.path.join(BASE_DIR, "smartcart.db")
+        MAIL_SERVER = 'smtp.gmail.com'
+        MAIL_PORT = 587
+        MAIL_USE_TLS = True
+        MAIL_USERNAME = 'kavithapolana19@gmail.com'
+        MAIL_PASSWORD = ''
+        RAZORPAY_KEY_ID = 'rzp_test_Tbw0XTMtbWT5rb'
+        RAZORPAY_KEY_SECRET = ''
+    config = ConfigFallback()
 
 app = Flask(__name__)
 app.secret_key = getattr(config, 'SECRET_KEY', 'abcdefg')
@@ -43,11 +40,11 @@ app.secret_key = getattr(config, 'SECRET_KEY', 'abcdefg')
 # EMAIL CONFIGURATION
 # =========================================================
 
-app.config['MAIL_SERVER'] = config.MAIL_SERVER
-app.config['MAIL_PORT'] = config.MAIL_PORT
-app.config['MAIL_USE_TLS'] = config.MAIL_USE_TLS
-app.config['MAIL_USERNAME'] = config.MAIL_USERNAME
-app.config['MAIL_PASSWORD'] = config.MAIL_PASSWORD
+app.config['MAIL_SERVER'] = getattr(config, 'MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(getattr(config, 'MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = bool(getattr(config, 'MAIL_USE_TLS', True))
+app.config['MAIL_USERNAME'] = getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com')
+app.config['MAIL_PASSWORD'] = getattr(config, 'MAIL_PASSWORD', '')
 
 mail = Mail(app)
 
@@ -58,8 +55,8 @@ mail = Mail(app)
 
 razorpay_client = razorpay.Client(
     auth=(
-        config.RAZORPAY_KEY_ID,
-        config.RAZORPAY_KEY_SECRET
+        getattr(config, 'RAZORPAY_KEY_ID', 'rzp_test_Tbw0XTMtbWT5rb'),
+        getattr(config, 'RAZORPAY_KEY_SECRET', '')
     )
 )
 
