@@ -33,18 +33,18 @@ except ImportError:
     config = ConfigFallback()
 
 app = Flask(__name__)
-app.secret_key = getattr(config, 'SECRET_KEY', 'abcdefg')
+app.secret_key = os.environ.get('SECRET_KEY', getattr(config, 'SECRET_KEY', 'abcdefg'))
 
 
 # =========================================================
-# EMAIL CONFIGURATION
+# EMAIL CONFIGURATION (Env vars + config.py fallback)
 # =========================================================
 
-app.config['MAIL_SERVER'] = getattr(config, 'MAIL_SERVER', 'smtp.gmail.com')
-app.config['MAIL_PORT'] = int(getattr(config, 'MAIL_PORT', 587))
-app.config['MAIL_USE_TLS'] = bool(getattr(config, 'MAIL_USE_TLS', True))
-app.config['MAIL_USERNAME'] = getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com')
-app.config['MAIL_PASSWORD'] = getattr(config, 'MAIL_PASSWORD', '')
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', getattr(config, 'MAIL_SERVER', 'smtp.gmail.com'))
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', getattr(config, 'MAIL_PORT', 587)))
+app.config['MAIL_USE_TLS'] = str(os.environ.get('MAIL_USE_TLS', getattr(config, 'MAIL_USE_TLS', True))).lower() in ('true', '1', 'yes')
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com'))
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', getattr(config, 'MAIL_PASSWORD', ''))
 
 mail = Mail(app)
 
@@ -53,11 +53,11 @@ mail = Mail(app)
 # RAZORPAY CONFIGURATION
 # =========================================================
 
+RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', getattr(config, 'RAZORPAY_KEY_ID', 'rzp_test_Tbw0XTMtbWT5rb'))
+RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', getattr(config, 'RAZORPAY_KEY_SECRET', ''))
+
 razorpay_client = razorpay.Client(
-    auth=(
-        getattr(config, 'RAZORPAY_KEY_ID', 'rzp_test_Tbw0XTMtbWT5rb'),
-        getattr(config, 'RAZORPAY_KEY_SECRET', '')
-    )
+    auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET)
 )
 
 
@@ -96,7 +96,9 @@ class SQLiteConnectionWrapper:
 
 
 def get_db_connection():
-    conn = sqlite3.connect(config.DB_PATH)
+    default_db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "smartcart.db")
+    db_path = os.environ.get('DB_PATH', getattr(config, 'DB_PATH', default_db_path))
+    conn = sqlite3.connect(db_path)
     conn.row_factory = dict_factory
     return SQLiteConnectionWrapper(conn)
 
@@ -117,7 +119,8 @@ def init_db():
         user_id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
+        password TEXT NOT NULL,
+        profile_image TEXT
     );
 
     CREATE TABLE IF NOT EXISTS products (
@@ -171,11 +174,40 @@ def init_db():
         price REAL NOT NULL
     );
     """)
+    try:
+        cursor.execute("ALTER TABLE users ADD COLUMN profile_image TEXT")
+    except Exception:
+        pass
     conn.commit()
     cursor.close()
     conn.close()
 
 init_db()
+
+
+# =========================================================
+# PASSWORD HASHING & SECURITY HELPERS
+# =========================================================
+
+def hash_password(plain_password: str) -> str:
+    if isinstance(plain_password, str):
+        plain_password = plain_password.encode('utf-8')
+    return bcrypt.hashpw(plain_password, bcrypt.gensalt()).decode('utf-8')
+
+
+def check_password(plain_password: str, stored_hash) -> bool:
+    if not stored_hash or not plain_password:
+        return False
+    if isinstance(stored_hash, str):
+        stored_hash = stored_hash.encode('utf-8')
+    if isinstance(plain_password, str):
+        plain_password = plain_password.encode('utf-8')
+    try:
+        return bcrypt.checkpw(plain_password, stored_hash)
+    except Exception as e:
+        app.logger.warning("Bcrypt check failed: %s", str(e))
+        return False
+
 
 
 # =========================================================
@@ -281,8 +313,12 @@ def admin_signup():
             "admin/admin_signup.html"
         )
 
-    name = request.form['name']
-    email = request.form['email']
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip()
+
+    if not name or not email:
+        flash("Name and email are required!", "danger")
+        return redirect('/admin-signup')
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -318,9 +354,10 @@ def admin_signup():
     session['otp'] = otp
 
     try:
+        sender = app.config.get('MAIL_USERNAME') or getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com')
         message = Message(
             subject="SmartCart Admin OTP",
-            sender=getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com'),
+            sender=sender,
             recipients=[email]
         )
         message.body = f"Your OTP for SmartCart Admin Registration is: {otp}"
@@ -352,8 +389,12 @@ def verify_otp_get():
 @app.route('/verify-otp', methods=['POST'])
 def verify_otp_post():
 
-    user_otp = request.form['otp']
-    password = request.form['password']
+    user_otp = request.form.get('otp', '').strip()
+    password = request.form.get('password', '')
+
+    if not session.get('signup_name') or not session.get('signup_email'):
+        flash("Session expired. Please register again.", "danger")
+        return redirect('/admin-signup')
 
     if str(session.get('otp')) != str(user_otp):
 
@@ -364,10 +405,7 @@ def verify_otp_post():
 
         return redirect('/verify-otp')
 
-    hashed_password = bcrypt.hashpw(
-        password.encode('utf-8'),
-        bcrypt.gensalt()
-    )
+    hashed_password = hash_password(password)
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -399,7 +437,7 @@ def verify_otp_post():
         "success"
     )
 
-    return redirect('/admin-signup')
+    return redirect('/admin-login')
 
 
 # =========================================================
@@ -418,8 +456,8 @@ def admin_login():
             "admin/admin_login.html"
         )
 
-    email = request.form['email']
-    password = request.form['password']
+    email = request.form.get('email', '').strip()
+    password = request.form.get('password', '')
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -443,14 +481,7 @@ def admin_login():
 
         return redirect('/admin-login')
 
-    stored_hashed_password = (
-        admin['password'].encode('utf-8')
-    )
-
-    if not bcrypt.checkpw(
-        password.encode('utf-8'),
-        stored_hashed_password
-    ):
+    if not check_password(password, admin['password']):
 
         flash(
             "Incorrect password! Try again.",
@@ -1063,10 +1094,10 @@ def admin_profile_update():
 
     admin_id = session['admin_id']
 
-    name = request.form['name']
-    email = request.form['email']
-    new_password = request.form['password']
-    new_image = request.files['profile_image']
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip()
+    new_password = request.form.get('password', '').strip()
+    new_image = request.files.get('profile_image')
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -1082,18 +1113,12 @@ def admin_profile_update():
 
     admin = cursor.fetchone()
 
-    old_image_name = admin['profile_image']
+    old_image_name = admin['profile_image'] if admin else None
 
     if new_password:
-
-        hashed_password = bcrypt.hashpw(
-            new_password.encode('utf-8'),
-            bcrypt.gensalt()
-        )
-
+        hashed_password = hash_password(new_password)
     else:
-
-        hashed_password = admin['password']
+        hashed_password = admin['password'] if admin else ''
 
     if new_image and new_image.filename != "":
 
@@ -1172,16 +1197,20 @@ def user_signup():
             "user/user_signup.html"
         )
 
-    name = request.form['name']
-    email = request.form['email']
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip()
+
+    if not name or not email:
+        flash("Name and email are required!", "danger")
+        return redirect('/user-signup')
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute(
         """
-        SELECT admin_id
-        FROM admin
+        SELECT user_id
+        FROM users
         WHERE email=?
         """,
         (email,)
@@ -1213,9 +1242,10 @@ def user_signup():
     session['otp'] = otp
 
     try:
+        sender = app.config.get('MAIL_USERNAME') or getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com')
         message = Message(
             subject="SmartCart User OTP",
-            sender=getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com'),
+            sender=sender,
             recipients=[email]
         )
         message.body = f"Your OTP for SmartCart user registration is: {otp}"
@@ -1249,8 +1279,12 @@ def verify_user_otp_get():
 @app.route('/user-verify-otp', methods=['POST'])
 def verify_user_otp_post():
 
-    user_otp = request.form['otp']
-    password = request.form['password']
+    user_otp = request.form.get('otp', '').strip()
+    password = request.form.get('password', '')
+
+    if not session.get('signup_name') or not session.get('signup_email'):
+        flash("Session expired. Please sign up again.", "danger")
+        return redirect('/user-signup')
 
     if str(session.get('otp')) != str(user_otp):
 
@@ -1261,16 +1295,13 @@ def verify_user_otp_post():
 
         return redirect('/user/verify-otp')
 
-    hashed_password = bcrypt.hashpw(
-        password.encode('utf-8'),
-        bcrypt.gensalt()
-    )
+    hashed_password = hash_password(password)
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO admin
+        INSERT INTO users
         (name, email, password)
         VALUES (?, ?, ?)
     """, (
@@ -1312,8 +1343,8 @@ def user_login():
             "user/user_login.html"
         )
 
-    email = request.form['email']
-    password = request.form['password']
+    email = request.form.get('email', '').strip()
+    password = request.form.get('password', '')
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -1321,7 +1352,7 @@ def user_login():
     cursor.execute(
         """
         SELECT *
-        FROM admin
+        FROM users
         WHERE email=?
         """,
         (email,)
@@ -1341,14 +1372,7 @@ def user_login():
 
         return redirect('/user-login')
 
-    stored_hashed_password = (
-        user['password'].encode('utf-8')
-    )
-
-    if not bcrypt.checkpw(
-        password.encode('utf-8'),
-        stored_hashed_password
-    ):
+    if not check_password(password, user['password']):
 
         flash(
             "Incorrect password! Try again.",
@@ -1357,7 +1381,7 @@ def user_login():
 
         return redirect('/user-login')
 
-    session['user_id'] = user['admin_id']
+    session['user_id'] = user['user_id']
     session['user_name'] = user['name']
     session['user_email'] = user['email']
 
@@ -1447,8 +1471,8 @@ def user_profile():
     cursor.execute(
         """
         SELECT *
-        FROM admin
-        WHERE admin_id=?
+        FROM users
+        WHERE user_id=?
         """,
         (user_id,)
     )
@@ -1482,9 +1506,9 @@ def user_profile_update():
 
     user_id = session['user_id']
 
-    name = request.form['name']
-    email = request.form['email']
-    new_password = request.form.get('password', '')
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip()
+    new_password = request.form.get('password', '').strip()
     new_image = request.files.get('profile_image')
 
     conn = get_db_connection()
@@ -1493,26 +1517,20 @@ def user_profile_update():
     cursor.execute(
         """
         SELECT *
-        FROM admin
-        WHERE admin_id=?
+        FROM users
+        WHERE user_id=?
         """,
         (user_id,)
     )
 
     user = cursor.fetchone()
 
-    old_image_name = user['profile_image'] if user else None
+    old_image_name = user['profile_image'] if (user and 'profile_image' in user) else None
 
     if new_password:
-
-        hashed_password = bcrypt.hashpw(
-            new_password.encode('utf-8'),
-            bcrypt.gensalt()
-        )
-
+        hashed_password = hash_password(new_password)
     else:
-
-        hashed_password = user['password'] if user else None
+        hashed_password = user['password'] if user else ''
 
     if new_image and new_image.filename != "":
 
@@ -1544,13 +1562,13 @@ def user_profile_update():
         final_image_name = old_image_name
 
     cursor.execute("""
-        UPDATE admin
+        UPDATE users
         SET
             name=?,
             email=?,
             password=?,
             profile_image=?
-        WHERE admin_id=?
+        WHERE user_id=?
     """, (
         name,
         email,
@@ -4103,6 +4121,23 @@ def user_logout():
     return render_template(
         "user/user_logout.html"
     )
+
+
+# =========================================================
+# ERROR HANDLERS
+# =========================================================
+
+@app.errorhandler(500)
+def handle_500_error(e):
+    app.logger.error("Internal Server Error: %s\n%s", str(e), traceback.format_exc())
+    return render_template(
+        "user/user_login.html"
+    ), 500
+
+
+@app.errorhandler(404)
+def handle_404_error(e):
+    return redirect('/user-login')
 
 
 # =========================================================
