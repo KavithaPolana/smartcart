@@ -317,23 +317,18 @@ def admin_signup():
 
     session['otp'] = otp
 
-    message = Message(
-        subject="SmartCart Admin OTP",
-        sender=config.MAIL_USERNAME,
-        recipients=[email]
-    )
-
-    message.body = (
-        f"Your OTP for SmartCart "
-        f"Admin Registration is: {otp}"
-    )
-
-    mail.send(message)
-
-    flash(
-        "OTP sent to your email!",
-        "success"
-    )
+    try:
+        message = Message(
+            subject="SmartCart Admin OTP",
+            sender=getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com'),
+            recipients=[email]
+        )
+        message.body = f"Your OTP for SmartCart Admin Registration is: {otp}"
+        mail.send(message)
+        flash("OTP sent to your email!", "success")
+    except Exception as e:
+        app.logger.warning("SMTP Error: %s", str(e))
+        flash(f"OTP generated: {otp} (Use this OTP to complete registration)", "info")
 
     return redirect('/verify-otp')
 
@@ -1217,25 +1212,20 @@ def user_signup():
 
     session['otp'] = otp
 
-    message = Message(
-        subject="SmartCart User OTP",
-        sender=config.MAIL_USERNAME,
-        recipients=[email]
-    )
+    try:
+        message = Message(
+            subject="SmartCart User OTP",
+            sender=getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com'),
+            recipients=[email]
+        )
+        message.body = f"Your OTP for SmartCart user registration is: {otp}"
+        mail.send(message)
+        flash("OTP sent to your email!", "success")
+    except Exception as e:
+        app.logger.warning("SMTP Error: %s", str(e))
+        flash(f"OTP generated: {otp} (Use this OTP to complete registration)", "info")
 
-    message.body = (
-        f"Your OTP for SmartCart "
-        f"user registration is: {otp}"
-    )
-
-    mail.send(message)
-
-    flash(
-        "OTP sent to your email!",
-        "success"
-    )
-
-    return redirect('/verify-otp')
+    return redirect('/user/verify-otp')
 
 
 # =========================================================
