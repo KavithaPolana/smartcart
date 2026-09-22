@@ -12,14 +12,31 @@ from utils.pdf_generator import generate_pdf
 import sqlite3
 import bcrypt
 import random
-import config
 import os
 import razorpay
 from werkzeug.utils import secure_filename
 
+try:
+    import config
+except ImportError:
+    try:
+        import config_example as config
+    except ImportError:
+        class ConfigFallback:
+            SECRET_KEY = "abcdefg"
+            BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+            DB_PATH = os.path.join(BASE_DIR, "smartcart.db")
+            MAIL_SERVER = 'smtp.gmail.com'
+            MAIL_PORT = 587
+            MAIL_USE_TLS = True
+            MAIL_USERNAME = 'kavithapolana19@gmail.com'
+            MAIL_PASSWORD = ''
+            RAZORPAY_KEY_ID = 'rzp_test_Tbw0XTMtbWT5rb'
+            RAZORPAY_KEY_SECRET = ''
+        config = ConfigFallback()
 
 app = Flask(__name__)
-app.secret_key = config.SECRET_KEY
+app.secret_key = getattr(config, 'SECRET_KEY', 'abcdefg')
 
 
 # =========================================================
@@ -507,13 +524,17 @@ def admin_logout():
 # IMAGE UPLOAD PATHS
 # =========================================================
 
-UPLOAD_FOLDER = 'static/uploads/product_images'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads', 'product_images')
+ADMIN_UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads', 'admin_profiles')
+USER_UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads', 'user_profiles')
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(ADMIN_UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(USER_UPLOAD_FOLDER, exist_ok=True)
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-ADMIN_UPLOAD_FOLDER = 'static/uploads/admin_profiles'
 app.config['ADMIN_UPLOAD_FOLDER'] = ADMIN_UPLOAD_FOLDER
-
-USER_UPLOAD_FOLDER = 'static/uploads/user_profiles'
 app.config['USER_UPLOAD_FOLDER'] = USER_UPLOAD_FOLDER
 
 
