@@ -82,9 +82,12 @@
                 <i class="fa-solid fa-bolt"></i> Pay with Razorpay Now
             </button>
 
-            <div style="margin-top: 1.5rem;">
+            <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
                 <a href="/user/address" class="btn btn-outline btn-sm">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Delivery Address
+                    <i class="fa-solid fa-arrow-left"></i> Back to Address
+                </a>
+                <a href="/user/cart" class="btn btn-outline btn-sm" style="color: var(--danger); border-color: var(--danger-light);">
+                    <i class="fa-solid fa-xmark"></i> Cancel & Return to Cart
                 </a>
             </div>
 
@@ -144,6 +147,15 @@
             theme: {
                 color: "#4f46e5"
             },
+            modal: {
+                ondismiss: function() {
+                    const payBtn = document.getElementById("pay-button");
+                    if (payBtn) {
+                        payBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Pay with Razorpay Now';
+                        payBtn.disabled = false;
+                    }
+                }
+            },
             handler: function(response) {
                 const payBtn = document.getElementById("pay-button");
                 if (payBtn) {
@@ -169,7 +181,7 @@
                     if (data.success) {
                         window.location.href = "/user/payment-success-page";
                     } else {
-                        alert("Payment verification failed.");
+                        alert(data.error || "Payment verification failed.");
                         if (payBtn) {
                             payBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Pay with Razorpay Now';
                             payBtn.disabled = false;
@@ -189,8 +201,27 @@
 
         const razorpayCheckout = new Razorpay(options);
 
+        razorpayCheckout.on('payment.failed', function(response) {
+            console.error("Payment failed:", response.error);
+            alert("Payment Failed / Cancelled: " + (response.error.description || "Transaction could not be completed."));
+            const payBtn = document.getElementById("pay-button");
+            if (payBtn) {
+                payBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Pay with Razorpay Now';
+                payBtn.disabled = false;
+            }
+        });
+
         document.getElementById("pay-button").onclick = function(event) {
+            const payBtn = document.getElementById("pay-button");
+            if (payBtn) {
+                payBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Opening Razorpay...';
+            }
             razorpayCheckout.open();
+            setTimeout(function() {
+                if (payBtn) {
+                    payBtn.innerHTML = '<i class="fa-solid fa-bolt"></i> Pay with Razorpay Now';
+                }
+            }, 2000);
             event.preventDefault();
         };
     </script>
