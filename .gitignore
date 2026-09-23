@@ -6,3 +6,5 @@ venv/
 .env
 .DS_Store
 config.py
+*.db
+smartcart.db

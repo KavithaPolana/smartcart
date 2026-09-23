@@ -320,7 +320,7 @@ def save_user_cart(user_id, cart):
 
 
 # =========================================================
-# HOME / PUBLIC LANDING PAGE
+# HOME / PUBLIC PORTAL SELECTION
 # =========================================================
 
 @app.route('/')
@@ -328,8 +328,24 @@ def home():
     return render_template("index.html")
 
 
-@app.route('/contact', methods=['POST'])
-def contact_submit():
+# =========================================================
+# ABOUT US PAGE
+# =========================================================
+
+@app.route('/about')
+def about():
+    return render_template("about.html")
+
+
+# =========================================================
+# CONTACT US PAGE & FORM HANDLER
+# =========================================================
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'GET':
+        return render_template("contact.html")
+
     name = request.form.get('name', '').strip()
     email = request.form.get('email', '').strip()
     subject = request.form.get('subject', 'SmartCart Inquiry').strip()
@@ -337,7 +353,7 @@ def contact_submit():
 
     if not name or not email or not user_msg:
         flash("Please fill all required fields in the contact form.", "danger")
-        return redirect('/#contact')
+        return redirect('/contact')
 
     try:
         sender = app.config.get('MAIL_USERNAME') or getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com')
@@ -353,7 +369,8 @@ def contact_submit():
         app.logger.warning("Contact mail error: %s", str(e))
         flash("Thank you! Your message has been received.", "success")
 
-    return redirect('/#contact')
+    return redirect('/contact')
+
 
 
 

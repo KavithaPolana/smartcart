@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>About Us - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=4">
+</head>
+<body class="public-page" style="min-height: 100vh; display: flex; flex-direction: column;">
+
+    <!-- Public Top Navbar -->
+    <header class="public-navbar">
+        <div class="public-nav-container">
+            <a href="/" class="public-brand">
+                <div class="public-brand-icon">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+                <div class="public-brand-text">
+                    <span class="brand-name">Smart<span>Cart</span></span>
+                </div>
+            </a>
+
+            <nav class="public-nav-links">
+                <a href="/" class="public-nav-item">Home</a>
+                <a href="/about" class="public-nav-item active">About Us</a>
+                <a href="/contact" class="public-nav-item">Contact</a>
+            </nav>
+
+            <div class="public-nav-actions">
+                <a href="/user-login" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-store"></i> Customer Login
+                </a>
+                <a href="/admin-login" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-shield-halved"></i> Admin Portal
+                </a>
+            </div>
+
+            <button type="button" class="public-mobile-toggle" id="public-menu-toggle" aria-label="Toggle navigation menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="public-mobile-drawer" id="public-mobile-drawer">
+            <a href="/" class="drawer-link"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/about" class="drawer-link"><i class="fa-solid fa-circle-info"></i> About Us</a>
+            <a href="/contact" class="drawer-link"><i class="fa-solid fa-envelope"></i> Contact Us</a>
+            <div class="drawer-btn-group">
+                <a href="/user-login" class="btn btn-primary btn-block"><i class="fa-solid fa-store"></i> Customer Login</a>
+                <a href="/admin-login" class="btn btn-secondary btn-block"><i class="fa-solid fa-shield-halved"></i> Admin Portal</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main About Content -->
+    <main style="flex: 1; padding: 3.5rem 1.25rem;">
+        <div style="max-width: 1000px; margin: 0 auto;">
+            
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <span class="section-badge"><i class="fa-solid fa-circle-info"></i> About Our Platform</span>
+                <h1 class="section-title">About SmartCart</h1>
+                <p class="section-subtitle" style="max-width: 650px; margin: 0 auto;">
+                    A modern, full-stack e-commerce shopping platform built for fast customer checkouts and powerful inventory management.
+                </p>
+            </div>
+
+            <div class="about-grid" style="margin-bottom: 3.5rem;">
+                <div class="about-content">
+                    <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-bottom: 1rem;">
+                        Shopping Made Smart, Simple & Secure
+                    </h2>
+                    <p class="about-p">
+                        SmartCart provides a seamless online shopping experience with real-time product catalogs, instant cart synchronization across devices, and 256-bit encrypted Razorpay payment processing.
+                    </p>
+                    <p class="about-p">
+                        With automated PDF invoice generation, multiple saved delivery addresses, and dual role-based security for customers and store administrators, SmartCart is engineered for reliability.
+                    </p>
+
+                    <div class="about-stats-row">
+                        <div class="stat-box">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Responsive Layout</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">256-Bit</span>
+                            <span class="stat-label">Razorpay SSL Security</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">Instant</span>
+                            <span class="stat-label">PDF Invoice Billing</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-card-visual">
+                    <div class="about-glass" style="box-shadow: var(--shadow-lg); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); padding: 2rem; background: #ffffff;">
+                        <div class="about-feature-row">
+                            <i class="fa-solid fa-check-circle" style="color: var(--success); font-size: 1.25rem;"></i>
+                            <div>
+                                <strong>Customer Shopping Portal</strong>
+                                <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">Explore live products, buy now or add to cart, and download tax invoices.</p>
+                            </div>
+                        </div>
+                        <div class="about-feature-row" style="margin-top: 1.25rem;">
+                            <i class="fa-solid fa-check-circle" style="color: var(--success); font-size: 1.25rem;"></i>
+                            <div>
+                                <strong>Administrator Control Center</strong>
+                                <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">Upload products, manage stock levels, update prices, and oversee customer orders.</p>
+                            </div>
+                        </div>
+                        <div class="about-feature-row" style="margin-top: 1.25rem;">
+                            <i class="fa-solid fa-check-circle" style="color: var(--success); font-size: 1.25rem;"></i>
+                            <div>
+                                <strong>Email OTP Password Recovery</strong>
+                                <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0;">Secure one-time passcodes sent via email for instant password resets.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Cards Grid -->
+            <div class="features-grid">
+                <div class="feature-item-card">
+                    <div class="feature-icon-box primary-box"><i class="fa-solid fa-bolt"></i></div>
+                    <h3>Fast Catalog</h3>
+                    <p>Live category filters, search and instant shopping cart updates.</p>
+                </div>
+                <div class="feature-item-card">
+                    <div class="feature-icon-box success-box"><i class="fa-solid fa-shield-halved"></i></div>
+                    <h3>Secure Checkout</h3>
+                    <p>256-bit encrypted Razorpay integration with duplicate payment guards.</p>
+                </div>
+                <div class="feature-item-card">
+                    <div class="feature-icon-box accent-box"><i class="fa-solid fa-file-pdf"></i></div>
+                    <h3>PDF Invoices</h3>
+                    <p>Automated PDF tax invoices generated instantly upon successful checkout.</p>
+                </div>
+                <div class="feature-item-card">
+                    <div class="feature-icon-box info-box"><i class="fa-solid fa-location-dot"></i></div>
+                    <h3>Address Book</h3>
+                    <p>Save multiple delivery locations with one-click default address selection.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="public-footer-simple">
+        <div class="footer-simple-container">
+            <p>&copy; 2026 SmartCart. All rights reserved.</p>
+            <div class="footer-simple-links">
+                <a href="/">Home</a>
+                <a href="/about">About Us</a>
+                <a href="/contact">Contact Us</a>
+                <a href="/user-login">Customer Login</a>
+                <a href="/admin-login">Admin Portal</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Drawer Script -->
+    <script>
+        const menuToggle = document.getElementById('public-menu-toggle');
+        const mobileDrawer = document.getElementById('public-mobile-drawer');
+        if (menuToggle && mobileDrawer) {
+            menuToggle.addEventListener('click', function () {
+                mobileDrawer.classList.toggle('open');
+            });
+        }
+    </script>
+
+</body>
+</html>

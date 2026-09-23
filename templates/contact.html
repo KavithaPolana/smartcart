@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Contact Us - SmartCart</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css?v=4">
+</head>
+<body class="public-page" style="min-height: 100vh; display: flex; flex-direction: column;">
+
+    <!-- Public Top Navbar -->
+    <header class="public-navbar">
+        <div class="public-nav-container">
+            <a href="/" class="public-brand">
+                <div class="public-brand-icon">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+                <div class="public-brand-text">
+                    <span class="brand-name">Smart<span>Cart</span></span>
+                </div>
+            </a>
+
+            <nav class="public-nav-links">
+                <a href="/" class="public-nav-item">Home</a>
+                <a href="/about" class="public-nav-item">About Us</a>
+                <a href="/contact" class="public-nav-item active">Contact</a>
+            </nav>
+
+            <div class="public-nav-actions">
+                <a href="/user-login" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-store"></i> Customer Login
+                </a>
+                <a href="/admin-login" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-shield-halved"></i> Admin Portal
+                </a>
+            </div>
+
+            <button type="button" class="public-mobile-toggle" id="public-menu-toggle" aria-label="Toggle navigation menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="public-mobile-drawer" id="public-mobile-drawer">
+            <a href="/" class="drawer-link"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/about" class="drawer-link"><i class="fa-solid fa-circle-info"></i> About Us</a>
+            <a href="/contact" class="drawer-link"><i class="fa-solid fa-envelope"></i> Contact Us</a>
+            <div class="drawer-btn-group">
+                <a href="/user-login" class="btn btn-primary btn-block"><i class="fa-solid fa-store"></i> Customer Login</a>
+                <a href="/admin-login" class="btn btn-secondary btn-block"><i class="fa-solid fa-shield-halved"></i> Admin Portal</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Contact Content -->
+    <main style="flex: 1; padding: 3.5rem 1.25rem;">
+        <div style="max-width: 1000px; margin: 0 auto;">
+            
+            <div style="text-align: center; margin-bottom: 2.5rem;">
+                <span class="section-badge"><i class="fa-solid fa-headset"></i> Support & Inquiry</span>
+                <h1 class="section-title">Contact Us</h1>
+                <p class="section-subtitle" style="max-width: 600px; margin: 0 auto;">
+                    Have questions about our store, products, or need support? Fill out the form or reach out to us directly.
+                </p>
+            </div>
+
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div style="max-width: 800px; margin: 0 auto 2rem;">
+                    <div class="flash-container">
+                    {% for category, message in messages %}
+                      <div class="flash-alert flash-{{ category if category != 'message' else 'info' }}">
+                        <div class="flash-alert-content">
+                          <i class="fa-solid fa-circle-check flash-alert-icon"></i>
+                          <span>{{ message }}</span>
+                        </div>
+                      </div>
+                    {% endfor %}
+                    </div>
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <div class="contact-grid">
+                <!-- Left: Support Info Cards -->
+                <div class="contact-info-col">
+                    <div class="contact-info-card">
+                        <div class="contact-info-icon"><i class="fa-solid fa-envelope"></i></div>
+                        <div>
+                            <h4 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 0.2rem;">Email Support</h4>
+                            <p style="font-size: 0.95rem; font-weight: 600; color: #4f46e5; margin: 0;">kavithapolana19@gmail.com</p>
+                            <span style="font-size: 0.8rem; color: #64748b;">Fast reply within 24 hours</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-info-card">
+                        <div class="contact-info-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div>
+                            <h4 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 0.2rem;">Admin Inquiries</h4>
+                            <p style="font-size: 0.95rem; font-weight: 600; color: #4f46e5; margin: 0;">admin@smartcart.com</p>
+                            <span style="font-size: 0.8rem; color: #64748b;">Catalog & store partnerships</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-info-card">
+                        <div class="contact-info-icon"><i class="fa-solid fa-clock"></i></div>
+                        <div>
+                            <h4 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 0.2rem;">Support Hours</h4>
+                            <p style="font-size: 0.95rem; font-weight: 600; color: #4f46e5; margin: 0;">Monday - Saturday</p>
+                            <span style="font-size: 0.8rem; color: #64748b;">9:00 AM - 8:00 PM IST</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Message Form -->
+                <div class="contact-form-col">
+                    <div class="card" style="border-radius: var(--radius-xl); padding: 2.25rem 2rem; border: 1px solid var(--border-subtle); box-shadow: var(--shadow-md); background: #ffffff;">
+                        <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem;">
+                            <i class="fa-solid fa-paper-plane" style="color: var(--primary);"></i> Send a Message
+                        </h3>
+                        <form method="POST" action="/contact">
+                            <div class="form-group">
+                                <label class="form-label">Your Name <span class="req">*</span></label>
+                                <div class="input-wrapper">
+                                    <input type="text" name="name" class="form-control" placeholder="Enter your full name" required>
+                                    <i class="fa-solid fa-user input-icon"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email Address <span class="req">*</span></label>
+                                <div class="input-wrapper">
+                                    <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
+                                    <i class="fa-solid fa-envelope input-icon"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Subject</label>
+                                <div class="input-wrapper">
+                                    <input type="text" name="subject" class="form-control" placeholder="How can we help?">
+                                    <i class="fa-solid fa-tag input-icon"></i>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Message <span class="req">*</span></label>
+                                <textarea name="message" class="form-control" rows="4" placeholder="Write your message here..." required style="padding-left: 1rem;"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+                                <i class="fa-solid fa-paper-plane"></i> Submit Inquiry
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="public-footer-simple">
+        <div class="footer-simple-container">
+            <p>&copy; 2026 SmartCart. All rights reserved.</p>
+            <div class="footer-simple-links">
+                <a href="/">Home</a>
+                <a href="/about">About Us</a>
+                <a href="/contact">Contact Us</a>
+                <a href="/user-login">Customer Login</a>
+                <a href="/admin-login">Admin Portal</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Drawer Script -->
+    <script>
+        const menuToggle = document.getElementById('public-menu-toggle');
+        const mobileDrawer = document.getElementById('public-mobile-drawer');
+        if (menuToggle && mobileDrawer) {
+            menuToggle.addEventListener('click', function () {
+                mobileDrawer.classList.toggle('open');
+            });
+        }
+    </script>
+
+</body>
+</html>
