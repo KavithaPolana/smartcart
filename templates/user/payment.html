@@ -17,13 +17,11 @@
             <span>SmartCart</span>
         </a>
 
-        <ul class="nav-links">
-            <li>
-                <a href="/user/address" class="nav-link">
-                    <i class="fa-solid fa-arrow-left"></i> Change Address
-                </a>
-            </li>
-        </ul>
+        <div class="user-nav-actions">
+            <a href="/user/address" class="btn btn-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left"></i> Change Address
+            </a>
+        </div>
     </header>
 
     <!-- Main Content -->
@@ -33,7 +31,7 @@
         <div class="checkout-stepper">
             <div class="step-item completed">
                 <div class="step-num"><i class="fa-solid fa-check"></i></div>
-                <span>Shopping Cart</span>
+                <span>Cart</span>
             </div>
             <div class="step-line completed"></div>
             <div class="step-item completed">
@@ -47,48 +45,59 @@
             </div>
         </div>
 
-        <div class="card glass-card" style="text-align: center; padding: 2.5rem 2rem;">
+        <div class="card glass-card payment-card">
             
-            <div style="width: 70px; height: 70px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1.25rem;">
+            <div class="payment-icon-wrapper">
                 <i class="fa-solid fa-shield-halved"></i>
             </div>
 
-            <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main);">
+            <h2 class="payment-title">
                 Complete Your Payment
             </h2>
-            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">
-                Powered securely by Razorpay
+            <p class="payment-subtitle">
+                Encrypted & 100% Safe Checkout via Razorpay
             </p>
 
-            <div style="background: var(--bg-surface-subtle); border-radius: var(--radius-lg); padding: 1.5rem; margin: 1.75rem 0; border: 1px solid var(--border-subtle);">
-                <span style="display: block; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 0.25rem;">
+            {% if user_name %}
+            <div class="payment-recipient-badge">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Delivering to <strong>{{ user_name }}</strong> {% if user_mobile %}({{ user_mobile }}){% endif %}</span>
+            </div>
+            {% endif %}
+
+            <div class="payment-box">
+                <span class="payment-box-label">
                     Total Payable Amount
                 </span>
-                <span style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">
+                <span class="payment-amount">
                     ₹{{ total }}
                 </span>
-                <div style="display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem; color: var(--text-muted); font-size: 0.85rem;">
+                <div class="payment-security-row">
                     <span><i class="fa-solid fa-lock" style="color: var(--success);"></i> 256-Bit SSL Encrypted</span>
-                    <span><i class="fa-brands fa-cc-visa"></i> <i class="fa-brands fa-cc-mastercard"></i> UPI / Cards</span>
+                    <span><i class="fa-solid fa-credit-card" style="color: var(--primary);"></i> UPI / Cards / NetBanking</span>
                 </div>
             </div>
 
             <button
                 type="button"
                 id="pay-button"
-                class="btn btn-primary btn-block btn-lg"
-                style="font-size: 1.1rem; padding: 1rem;"
+                class="btn btn-primary btn-block btn-lg pay-now-btn"
             >
-                <i class="fa-solid fa-bolt"></i> Pay with Razorpay Now
+                <i class="fa-solid fa-bolt"></i> Pay ₹{{ total }} Now
             </button>
 
-            <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
+            <div class="payment-actions">
                 <a href="/user/address" class="btn btn-outline btn-sm">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Address
+                    <i class="fa-solid fa-arrow-left"></i> Change Address
                 </a>
                 <a href="/user/cart" class="btn btn-outline btn-sm" style="color: var(--danger); border-color: var(--danger-light);">
-                    <i class="fa-solid fa-xmark"></i> Cancel & Return to Cart
+                    <i class="fa-solid fa-xmark"></i> Cancel & Return
                 </a>
+            </div>
+
+            <div class="payment-trust-badge">
+                <i class="fa-solid fa-circle-check" style="color: var(--success);"></i>
+                <span>Guaranteed Safe & Secure Checkout</span>
             </div>
 
         </div>
