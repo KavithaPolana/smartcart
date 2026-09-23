@@ -27,9 +27,9 @@ except ImportError:
         MAIL_PORT = 587
         MAIL_USE_TLS = True
         MAIL_USERNAME = 'kavithapolana19@gmail.com'
-        MAIL_PASSWORD = ''
+        MAIL_PASSWORD = 'quqx woma efwa mkwq'
         RAZORPAY_KEY_ID = 'rzp_test_Tbw0XTMtbWT5rb'
-        RAZORPAY_KEY_SECRET = ''
+        RAZORPAY_KEY_SECRET = 'f4VOdDO9FMPjepPmIhyZGNpw'
     config = ConfigFallback()
 
 app = Flask(__name__)
@@ -44,7 +44,7 @@ app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', getattr(config, 'MAIL_
 app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', getattr(config, 'MAIL_PORT', 587)))
 app.config['MAIL_USE_TLS'] = str(os.environ.get('MAIL_USE_TLS', getattr(config, 'MAIL_USE_TLS', True))).lower() in ('true', '1', 'yes')
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com'))
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', getattr(config, 'MAIL_PASSWORD', ''))
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', getattr(config, 'MAIL_PASSWORD', 'quqx woma efwa mkwq'))
 
 mail = Mail(app)
 
@@ -54,7 +54,7 @@ mail = Mail(app)
 # =========================================================
 
 RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', getattr(config, 'RAZORPAY_KEY_ID', 'rzp_test_Tbw0XTMtbWT5rb'))
-RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', getattr(config, 'RAZORPAY_KEY_SECRET', ''))
+RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', getattr(config, 'RAZORPAY_KEY_SECRET', 'f4VOdDO9FMPjepPmIhyZGNpw'))
 
 razorpay_client = razorpay.Client(
     auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET)
@@ -3091,7 +3091,7 @@ def user_payment():
         "user/payment.html",
 
         razorpay_key_id=
-            config.RAZORPAY_KEY_ID,
+            RAZORPAY_KEY_ID,
 
         razorpay_order_id=
             razorpay_order['id'],
