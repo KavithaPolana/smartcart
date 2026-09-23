@@ -2,66 +2,115 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Login - SmartCart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Customer Login - SmartCart</title>
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body class="auth-page">
+<body class="auth-page-wrapper">
 
-    <div class="auth-card">
-        <div class="auth-header">
-            <div class="auth-logo-badge">
-                <i class="fa-solid fa-cart-shopping"></i>
+    <!-- Pre-Login Navbar -->
+    <header class="public-navbar">
+        <div class="public-nav-container">
+            <a href="/" class="public-brand">
+                <div class="public-brand-icon">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+                <div class="public-brand-text">
+                    <span class="brand-name">Smart<span>Cart</span></span>
+                </div>
+            </a>
+
+            <nav class="public-nav-links">
+                <a href="/" class="public-nav-item">Home</a>
+                <a href="/#about" class="public-nav-item">About Us</a>
+                <a href="/#contact" class="public-nav-item">Contact</a>
+            </nav>
+
+            <div class="public-nav-actions">
+                <a href="/user-signup" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-user-plus"></i> Register
+                </a>
+                <a href="/admin-login" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-shield-halved"></i> Admin Portal
+                </a>
             </div>
-            <h2 class="auth-title">Welcome Back</h2>
-            <p class="auth-subtitle">Login to your SmartCart account</p>
         </div>
+    </header>
 
-        <!-- Flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div class="flash-container">
-            {% for category, message in messages %}
-              <div class="flash-alert flash-{{ category if category != 'message' else 'danger' }}">
-                <div class="flash-alert-content">
-                  <i class="fa-solid fa-circle-exclamation flash-alert-icon"></i>
-                  <span>{{ message }}</span>
+    <!-- Main Auth Content -->
+    <main class="auth-content-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo-badge">
+                    <i class="fa-solid fa-cart-shopping"></i>
                 </div>
-              </div>
-            {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-
-        <form method="POST" action="/user-login">
-            <div class="form-group">
-                <label class="form-label">Email Address <span class="req">*</span></label>
-                <div class="input-wrapper">
-                    <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
-                    <i class="fa-solid fa-envelope input-icon"></i>
-                </div>
+                <h2 class="auth-title">Customer Login</h2>
+                <p class="auth-subtitle">Login to your SmartCart customer account</p>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Password <span class="req">*</span></label>
-                <div class="input-wrapper">
-                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
-                    <i class="fa-solid fa-lock input-icon"></i>
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="flash-container">
+                {% for category, message in messages %}
+                  <div class="flash-alert flash-{{ category if category != 'message' else 'danger' }}">
+                    <div class="flash-alert-content">
+                      <i class="fa-solid fa-circle-exclamation flash-alert-icon"></i>
+                      <span>{{ message }}</span>
+                    </div>
+                  </div>
+                {% endfor %}
                 </div>
+              {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="/user-login">
+                <div class="form-group">
+                    <label class="form-label">Email Address <span class="req">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="email" name="email" class="form-control" placeholder="name@example.com" required autocomplete="email">
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                        <label class="form-label" style="margin-bottom: 0;">Password <span class="req">*</span></label>
+                        <a href="/user/forgot-password" style="font-size: 0.82rem; font-weight: 600; color: var(--primary);">Forgot Password?</a>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+                    <i class="fa-solid fa-right-to-bracket"></i> Login to SmartCart
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="/user-signup">Create Account</a></p>
+                <p style="margin-top: 0.5rem;"><a href="/admin-login" style="color: var(--text-muted); font-size: 0.85rem;"><i class="fa-solid fa-shield-halved"></i> Switch to Admin Portal</a></p>
             </div>
-
-            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
-                <i class="fa-solid fa-right-to-bracket"></i> Login
-            </button>
-        </form>
-
-        <div class="auth-footer">
-            <p>Don't have an account? <a href="/user-signup">Create Account</a></p>
-            <p style="margin-top: 0.5rem;"><a href="/admin-login" style="color: var(--text-muted); font-size: 0.85rem;"><i class="fa-solid fa-shield-halved"></i> Admin Login</a></p>
         </div>
-    </div>
+    </main>
+
+    <!-- Public Footer -->
+    <footer class="public-footer">
+        <div class="public-footer-container">
+            <div class="footer-bottom-bar" style="border-top: none; padding-top: 0;">
+                <p>&copy; 2026 SmartCart. All rights reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="/">Home</a>
+                    <a href="/user-signup">Create Account</a>
+                    <a href="/admin-login">Admin Portal</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
 </body>
 </html>

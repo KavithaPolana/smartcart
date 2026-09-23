@@ -320,13 +320,41 @@ def save_user_cart(user_id, cart):
 
 
 # =========================================================
-# HOME
+# HOME / PUBLIC LANDING PAGE
 # =========================================================
 
 @app.route('/')
 def home():
+    return render_template("index.html")
 
-    return redirect('/admin-signup')
+
+@app.route('/contact', methods=['POST'])
+def contact_submit():
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip()
+    subject = request.form.get('subject', 'SmartCart Inquiry').strip()
+    user_msg = request.form.get('message', '').strip()
+
+    if not name or not email or not user_msg:
+        flash("Please fill all required fields in the contact form.", "danger")
+        return redirect('/#contact')
+
+    try:
+        sender = app.config.get('MAIL_USERNAME') or getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com')
+        msg = Message(
+            subject=f"SmartCart Contact: {subject} from {name}",
+            sender=sender,
+            recipients=[sender]
+        )
+        msg.body = f"Sender Name: {name}\nSender Email: {email}\nSubject: {subject}\n\nMessage:\n{user_msg}"
+        mail.send(msg)
+        flash("Thank you! Your message has been sent successfully. We will get back to you shortly.", "success")
+    except Exception as e:
+        app.logger.warning("Contact mail error: %s", str(e))
+        flash("Thank you! Your message has been received.", "success")
+
+    return redirect('/#contact')
+
 
 
 # =========================================================
@@ -537,6 +565,99 @@ def admin_login():
     )
 
     return redirect('/admin-dashboard')
+
+
+# =========================================================
+# ADMIN FORGOT PASSWORD
+# =========================================================
+
+@app.route('/admin/forgot-password', methods=['GET', 'POST'])
+def admin_forgot_password():
+    if request.method == 'GET':
+        return render_template("admin/admin_forgot_password.html")
+
+    email = request.form.get('email', '').strip()
+    if not email:
+        flash("Please enter your registered admin email.", "danger")
+        return redirect('/admin/forgot-password')
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT admin_id, name FROM admin WHERE email=?", (email,))
+    admin = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if not admin:
+        flash("No administrator account found with this email address.", "danger")
+        return redirect('/admin/forgot-password')
+
+    otp = random.randint(100000, 999999)
+    session['admin_reset_email'] = email
+    session['admin_reset_otp'] = otp
+
+    try:
+        sender = app.config.get('MAIL_USERNAME') or getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com')
+        message = Message(
+            subject="SmartCart Admin Password Reset OTP",
+            sender=sender,
+            recipients=[email]
+        )
+        message.body = f"Hello {admin.get('name', 'Admin')},\n\nYour OTP to reset your SmartCart Admin Password is: {otp}\n\nIf you did not request this, please ignore this email."
+        mail.send(message)
+        flash("Password reset OTP sent to your email!", "success")
+    except Exception as e:
+        app.logger.warning("SMTP Error: %s", str(e))
+        flash(f"OTP generated: {otp} (Use this OTP to reset your password)", "info")
+
+    return redirect('/admin/reset-password')
+
+
+# =========================================================
+# ADMIN RESET PASSWORD
+# =========================================================
+
+@app.route('/admin/reset-password', methods=['GET', 'POST'])
+def admin_reset_password():
+    if request.method == 'GET':
+        if not session.get('admin_reset_email'):
+            flash("Please enter your email to request a reset OTP.", "warning")
+            return redirect('/admin/forgot-password')
+        return render_template("admin/admin_reset_password.html", email=session.get('admin_reset_email'))
+
+    user_otp = request.form.get('otp', '').strip()
+    new_password = request.form.get('password', '')
+    confirm_password = request.form.get('confirm_password', '')
+
+    if not session.get('admin_reset_email') or not session.get('admin_reset_otp'):
+        flash("Password reset session expired. Please try again.", "danger")
+        return redirect('/admin/forgot-password')
+
+    if str(session.get('admin_reset_otp')) != str(user_otp):
+        flash("Invalid OTP entered. Please check and try again.", "danger")
+        return redirect('/admin/reset-password')
+
+    if len(new_password) < 6:
+        flash("Password must be at least 6 characters long.", "danger")
+        return redirect('/admin/reset-password')
+
+    if new_password != confirm_password:
+        flash("Passwords do not match. Please re-enter.", "danger")
+        return redirect('/admin/reset-password')
+
+    hashed_password = hash_password(new_password)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE admin SET password=? WHERE email=?", (hashed_password, session['admin_reset_email']))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    session.pop('admin_reset_otp', None)
+    session.pop('admin_reset_email', None)
+
+    flash("Admin password reset successfully! Please login with your new password.", "success")
+    return redirect('/admin-login')
 
 
 # =========================================================
@@ -1445,6 +1566,101 @@ def user_login():
     )
 
     return redirect('/user-dashboard')
+
+
+# =========================================================
+# USER FORGOT PASSWORD
+# =========================================================
+
+@app.route('/user/forgot-password', methods=['GET', 'POST'])
+@app.route('/user-forgot-password', methods=['GET', 'POST'])
+def user_forgot_password():
+    if request.method == 'GET':
+        return render_template("user/user_forgot_password.html")
+
+    email = request.form.get('email', '').strip()
+    if not email:
+        flash("Please enter your registered email address.", "danger")
+        return redirect('/user/forgot-password')
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT user_id, name FROM users WHERE email=?", (email,))
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if not user:
+        flash("No user account found with this email address.", "danger")
+        return redirect('/user/forgot-password')
+
+    otp = random.randint(100000, 999999)
+    session['user_reset_email'] = email
+    session['user_reset_otp'] = otp
+
+    try:
+        sender = app.config.get('MAIL_USERNAME') or getattr(config, 'MAIL_USERNAME', 'kavithapolana19@gmail.com')
+        message = Message(
+            subject="SmartCart User Password Reset OTP",
+            sender=sender,
+            recipients=[email]
+        )
+        message.body = f"Hello {user.get('name', 'Customer')},\n\nYour OTP to reset your SmartCart account password is: {otp}\n\nIf you did not request this, please ignore this email."
+        mail.send(message)
+        flash("Password reset OTP sent to your email!", "success")
+    except Exception as e:
+        app.logger.warning("SMTP Error: %s", str(e))
+        flash(f"OTP generated: {otp} (Use this OTP to reset your password)", "info")
+
+    return redirect('/user/reset-password')
+
+
+# =========================================================
+# USER RESET PASSWORD
+# =========================================================
+
+@app.route('/user/reset-password', methods=['GET', 'POST'])
+@app.route('/user-reset-password', methods=['GET', 'POST'])
+def user_reset_password():
+    if request.method == 'GET':
+        if not session.get('user_reset_email'):
+            flash("Please enter your email to request a reset OTP.", "warning")
+            return redirect('/user/forgot-password')
+        return render_template("user/user_reset_password.html", email=session.get('user_reset_email'))
+
+    user_otp = request.form.get('otp', '').strip()
+    new_password = request.form.get('password', '')
+    confirm_password = request.form.get('confirm_password', '')
+
+    if not session.get('user_reset_email') or not session.get('user_reset_otp'):
+        flash("Password reset session expired. Please try again.", "danger")
+        return redirect('/user/forgot-password')
+
+    if str(session.get('user_reset_otp')) != str(user_otp):
+        flash("Invalid OTP entered. Please check and try again.", "danger")
+        return redirect('/user/reset-password')
+
+    if len(new_password) < 6:
+        flash("Password must be at least 6 characters long.", "danger")
+        return redirect('/user/reset-password')
+
+    if new_password != confirm_password:
+        flash("Passwords do not match. Please re-enter.", "danger")
+        return redirect('/user/reset-password')
+
+    hashed_password = hash_password(new_password)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET password=? WHERE email=?", (hashed_password, session['user_reset_email']))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    session.pop('user_reset_otp', None)
+    session.pop('user_reset_email', None)
+
+    flash("Password reset successfully! Please login with your new password.", "success")
+    return redirect('/user-login')
 
 
 # =========================================================

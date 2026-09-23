@@ -2,65 +2,112 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Admin Registration - SmartCart</title>
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body class="auth-page" style="background: radial-gradient(circle at top right, #1e1b4b 0%, #0f172a 100%);">
+<body class="auth-page-wrapper admin-auth-bg">
 
-    <div class="auth-card" style="border-top: 4px solid var(--primary);">
-        <div class="auth-header">
-            <div class="auth-logo-badge" style="background: linear-gradient(135deg, #4f46e5 0%, #0f172a 100%);">
-                <i class="fa-solid fa-user-shield"></i>
+    <!-- Pre-Login Navbar -->
+    <header class="public-navbar admin-public-nav">
+        <div class="public-nav-container">
+            <a href="/" class="public-brand">
+                <div class="public-brand-icon" style="background: linear-gradient(135deg, #4f46e5 0%, #0f172a 100%);">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="public-brand-text">
+                    <span class="brand-name" style="color: #ffffff;">Smart<span>Cart</span> <small style="font-size: 0.75rem; color: #94a3b8; font-weight: 500;">Admin</small></span>
+                </div>
+            </a>
+
+            <nav class="public-nav-links">
+                <a href="/" class="public-nav-item">Home</a>
+                <a href="/#about" class="public-nav-item">About Us</a>
+                <a href="/#contact" class="public-nav-item">Contact</a>
+            </nav>
+
+            <div class="public-nav-actions">
+                <a href="/admin-login" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-lock"></i> Admin Login
+                </a>
+                <a href="/user-login" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-store"></i> Customer Portal
+                </a>
             </div>
-            <h2 class="auth-title">Admin Registration</h2>
-            <p class="auth-subtitle">Register a new administrator account</p>
         </div>
+    </header>
 
-        <!-- Flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div class="flash-container">
-            {% for category, message in messages %}
-              <div class="flash-alert flash-{{ category if category != 'message' else 'danger' }}">
-                <div class="flash-alert-content">
-                  <i class="fa-solid fa-circle-exclamation flash-alert-icon"></i>
-                  <span>{{ message }}</span>
+    <!-- Main Auth Content -->
+    <main class="auth-content-container">
+        <div class="auth-card" style="border-top: 4px solid var(--primary);">
+            <div class="auth-header">
+                <div class="auth-logo-badge" style="background: linear-gradient(135deg, #4f46e5 0%, #0f172a 100%);">
+                    <i class="fa-solid fa-user-shield"></i>
                 </div>
-              </div>
-            {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-
-        <form method="POST" action="/admin-signup">
-            <div class="form-group">
-                <label class="form-label">Full Name <span class="req">*</span></label>
-                <div class="input-wrapper">
-                    <input type="text" name="name" class="form-control" placeholder="Admin Name" required>
-                    <i class="fa-solid fa-user input-icon"></i>
-                </div>
+                <h2 class="auth-title">Admin Registration</h2>
+                <p class="auth-subtitle">Register a new administrator account for SmartCart</p>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Admin Email <span class="req">*</span></label>
-                <div class="input-wrapper">
-                    <input type="email" name="email" class="form-control" placeholder="admin@smartcart.com" required>
-                    <i class="fa-solid fa-envelope input-icon"></i>
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="flash-container">
+                {% for category, message in messages %}
+                  <div class="flash-alert flash-{{ category if category != 'message' else 'danger' }}">
+                    <div class="flash-alert-content">
+                      <i class="fa-solid fa-circle-exclamation flash-alert-icon"></i>
+                      <span>{{ message }}</span>
+                    </div>
+                  </div>
+                {% endfor %}
                 </div>
+              {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="/admin-signup">
+                <div class="form-group">
+                    <label class="form-label">Full Name <span class="req">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" name="name" class="form-control" placeholder="Admin Name" required autocomplete="name">
+                        <i class="fa-solid fa-user input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Admin Email <span class="req">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="email" name="email" class="form-control" placeholder="admin@smartcart.com" required autocomplete="email">
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
+                    <i class="fa-solid fa-paper-plane"></i> Send Admin OTP
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Already registered? <a href="/admin-login">Login to Portal</a></p>
+                <p style="margin-top: 0.5rem;"><a href="/user-signup" style="color: var(--text-muted); font-size: 0.85rem;"><i class="fa-solid fa-store"></i> Customer Registration</a></p>
             </div>
-
-            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">
-                <i class="fa-solid fa-paper-plane"></i> Send Admin OTP
-            </button>
-        </form>
-
-        <div class="auth-footer">
-            <p>Already registered? <a href="/admin-login">Login to Portal</a></p>
         </div>
-    </div>
+    </main>
+
+    <!-- Public Footer -->
+    <footer class="public-footer">
+        <div class="public-footer-container">
+            <div class="footer-bottom-bar" style="border-top: none; padding-top: 0;">
+                <p>&copy; 2026 SmartCart Admin Control Center.</p>
+                <div class="footer-bottom-links">
+                    <a href="/">Home</a>
+                    <a href="/admin-login">Admin Login</a>
+                    <a href="/user-login">Customer Portal</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
 </body>
 </html>

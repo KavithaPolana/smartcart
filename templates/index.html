@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Welcome to SmartCart - Modern E-Commerce Platform</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="public-page">
+
+    <!-- =========================================================
+         1. PUBLIC PRE-LOGIN TOP NAVBAR
+         ========================================================= -->
+    <header class="public-navbar">
+        <div class="public-nav-container">
+            <!-- Brand Logo -->
+            <a href="/" class="public-brand">
+                <div class="public-brand-icon">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </div>
+                <div class="public-brand-text">
+                    <span class="brand-name">Smart<span>Cart</span></span>
+                    <span class="brand-tagline">Shop Smart & Save</span>
+                </div>
+            </a>
+
+            <!-- Navigation Links (Desktop) -->
+            <nav class="public-nav-links">
+                <a href="#hero" class="public-nav-item active">Home</a>
+                <a href="#portals" class="public-nav-item">Portals</a>
+                <a href="#features" class="public-nav-item">Features</a>
+                <a href="#about" class="public-nav-item">About Us</a>
+                <a href="#contact" class="public-nav-item">Contact</a>
+            </nav>
+
+            <!-- Auth Quick Actions -->
+            <div class="public-nav-actions">
+                <a href="/user-login" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-store"></i> Customer Login
+                </a>
+                <a href="/admin-login" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-shield-halved"></i> Admin Portal
+                </a>
+            </div>
+
+            <!-- Mobile Hamburger Toggle Button -->
+            <button type="button" class="public-mobile-toggle" id="public-menu-toggle" aria-label="Toggle navigation menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div class="public-mobile-drawer" id="public-mobile-drawer">
+            <a href="#hero" class="drawer-link"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="#portals" class="drawer-link"><i class="fa-solid fa-layer-group"></i> Select Portal</a>
+            <a href="#features" class="drawer-link"><i class="fa-solid fa-sparkles"></i> Features</a>
+            <a href="#about" class="drawer-link"><i class="fa-solid fa-circle-info"></i> About Us</a>
+            <a href="#contact" class="drawer-link"><i class="fa-solid fa-envelope"></i> Contact Us</a>
+            <div class="drawer-btn-group">
+                <a href="/user-login" class="btn btn-primary btn-block"><i class="fa-solid fa-store"></i> Customer Login</a>
+                <a href="/admin-login" class="btn btn-secondary btn-block"><i class="fa-solid fa-shield-halved"></i> Admin Portal</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Messages (if any) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="page-wrapper page-wrapper-medium" style="padding-top: 1rem; padding-bottom: 0;">
+            <div class="flash-container">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category if category != 'message' else 'info' }}">
+                <div class="flash-alert-content">
+                  <i class="fa-solid fa-circle-info flash-alert-icon"></i>
+                  <span>{{ message }}</span>
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- =========================================================
+         2. HERO SECTION & ROLE / PORTAL SELECTION CARDS
+         ========================================================= -->
+    <section class="landing-hero-section" id="hero">
+        <div class="landing-hero-container">
+            <div class="landing-badge">
+                <i class="fa-solid fa-bolt"></i> Next-Generation E-Commerce Experience
+            </div>
+            <h1 class="landing-hero-title">
+                Welcome to <span>SmartCart</span>
+            </h1>
+            <p class="landing-hero-subtitle">
+                One platform for shoppers and administrators. Choose your portal below to browse our smart catalog or manage store inventory.
+            </p>
+
+            <!-- PORTAL SELECTION CARDS -->
+            <div class="portal-selection-wrapper" id="portals">
+                <div class="portal-cards-grid">
+                    
+                    <!-- USER / CUSTOMER PORTAL CARD -->
+                    <div class="portal-card user-portal-card">
+                        <div class="portal-card-glow"></div>
+                        <div class="portal-card-header">
+                            <div class="portal-icon user-portal-icon">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                            </div>
+                            <span class="portal-badge-pill">Customer Store</span>
+                        </div>
+                        <h2 class="portal-card-title">Customer / User Portal</h2>
+                        <p class="portal-card-desc">
+                            Discover quality products, manage your cart, enjoy 256-bit encrypted Razorpay checkout, and download instant PDF tax invoices.
+                        </p>
+                        
+                        <ul class="portal-features-list">
+                            <li><i class="fa-solid fa-circle-check"></i> Live Product Catalog & Search</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Persistent Cart & Delivery Addresses</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Instant Razorpay UPI & Card Payments</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Automated PDF Invoice Downloads</li>
+                        </ul>
+
+                        <div class="portal-card-actions">
+                            <a href="/user-login" class="btn btn-primary btn-block btn-lg">
+                                <i class="fa-solid fa-right-to-bracket"></i> Customer Login
+                            </a>
+                            <a href="/user-signup" class="btn btn-outline btn-block">
+                                <i class="fa-solid fa-user-plus"></i> Create New Account
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ADMIN PORTAL CARD -->
+                    <div class="portal-card admin-portal-card">
+                        <div class="portal-card-glow admin-glow"></div>
+                        <div class="portal-card-header">
+                            <div class="portal-icon admin-portal-icon">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <span class="portal-badge-pill admin-badge-pill">Management</span>
+                        </div>
+                        <h2 class="portal-card-title">Admin Management Portal</h2>
+                        <p class="portal-card-desc">
+                            Comprehensive store backend to add products, update prices, manage inventory levels, track customer orders, and configure store settings.
+                        </p>
+
+                        <ul class="portal-features-list">
+                            <li><i class="fa-solid fa-circle-check"></i> Add & Update Catalog Products</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Real-time Stock & Price Control</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Administrator Profile & Security</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Customer Storefront Preview</li>
+                        </ul>
+
+                        <div class="portal-card-actions">
+                            <a href="/admin-login" class="btn btn-dark-admin btn-block btn-lg">
+                                <i class="fa-solid fa-lock"></i> Admin Portal Login
+                            </a>
+                            <a href="/admin-signup" class="btn btn-outline btn-block">
+                                <i class="fa-solid fa-user-shield"></i> Register Administrator
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         3. KEY FEATURES SECTION
+         ========================================================= -->
+    <section class="landing-section" id="features">
+        <div class="landing-section-container">
+            <div class="section-header-center">
+                <span class="section-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Platform Highlights</span>
+                <h2 class="section-title">Built for Performance & Security</h2>
+                <p class="section-subtitle">Everything you need for a fast, modern shopping experience and store administration.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-item-card">
+                    <div class="feature-icon-box primary-box">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <h3>Lightning Fast Catalog</h3>
+                    <p>Instant category filtering, real-time search, and smooth product showcase built for mobile and desktop.</p>
+                </div>
+
+                <div class="feature-item-card">
+                    <div class="feature-icon-box success-box">
+                        <i class="fa-solid fa-shield-check"></i>
+                    </div>
+                    <h3>256-Bit Razorpay Security</h3>
+                    <p>Safe payments via UPI, Credit/Debit cards, NetBanking, and automated duplicate-charge prevention.</p>
+                </div>
+
+                <div class="feature-item-card">
+                    <div class="feature-icon-box accent-box">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3>Instant PDF Invoices</h3>
+                    <p>Automated professional PDF tax invoice generation ready for one-click customer download.</p>
+                </div>
+
+                <div class="feature-item-card">
+                    <div class="feature-icon-box info-box">
+                        <i class="fa-solid fa-truck-fast"></i>
+                    </div>
+                    <h3>Multi-Address Management</h3>
+                    <p>Save multiple delivery addresses, set default locations, and enjoy a frictionless 3-step checkout flow.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         4. ABOUT US SECTION
+         ========================================================= -->
+    <section class="landing-section landing-about-section" id="about">
+        <div class="landing-section-container">
+            <div class="about-grid">
+                <div class="about-content">
+                    <span class="section-badge"><i class="fa-solid fa-circle-info"></i> About SmartCart</span>
+                    <h2 class="section-title">Seamless Shopping & Smart Store Ops</h2>
+                    <p class="about-p">
+                        SmartCart is a full-featured e-commerce platform designed from the ground up to offer an effortless shopping experience for customers and intuitive inventory management for administrators.
+                    </p>
+                    <p class="about-p">
+                        From persistent shopping carts that remember your selections across logins, to responsive mobile-friendly checkouts and password recovery via secure email OTPs, SmartCart combines power and simplicity.
+                    </p>
+                    <div class="about-stats-row">
+                        <div class="stat-box">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Responsive Design</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">256-Bit</span>
+                            <span class="stat-label">SSL Encryption</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-number">24/7</span>
+                            <span class="stat-label">Instant PDF Billing</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-card-visual">
+                    <div class="glass-card about-glass">
+                        <div class="about-feature-row">
+                            <i class="fa-solid fa-check-circle"></i>
+                            <div>
+                                <strong>Role-Based Security</strong>
+                                <p>Separate portals and credentials for administrators and shoppers.</p>
+                            </div>
+                        </div>
+                        <div class="about-feature-row">
+                            <i class="fa-solid fa-check-circle"></i>
+                            <div>
+                                <strong>Email OTP Password Recovery</strong>
+                                <p>Forgot password recovery with fast one-time passcode verification.</p>
+                            </div>
+                        </div>
+                        <div class="about-feature-row">
+                            <i class="fa-solid fa-check-circle"></i>
+                            <div>
+                                <strong>Production Ready</strong>
+                                <p>Optimized for rapid deployment across cloud platforms.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         5. CONTACT US SECTION
+         ========================================================= -->
+    <section class="landing-section" id="contact">
+        <div class="landing-section-container">
+            <div class="section-header-center">
+                <span class="section-badge"><i class="fa-solid fa-headset"></i> Support & Inquiry</span>
+                <h2 class="section-title">Get In Touch With Us</h2>
+                <p class="section-subtitle">Have questions or feedback? We are here to help you.</p>
+            </div>
+
+            <div class="contact-grid">
+                <!-- Contact Info Cards -->
+                <div class="contact-info-col">
+                    <div class="contact-info-card">
+                        <div class="contact-info-icon"><i class="fa-solid fa-envelope"></i></div>
+                        <div>
+                            <h4>Email Support</h4>
+                            <p>kavithapolana19@gmail.com</p>
+                            <span class="contact-sub">Responses within 24 hours</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-info-card">
+                        <div class="contact-info-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div>
+                            <h4>Administrator Inquiries</h4>
+                            <p>admin@smartcart.com</p>
+                            <span class="contact-sub">Store and vendor partnerships</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-info-card">
+                        <div class="contact-info-icon"><i class="fa-solid fa-clock"></i></div>
+                        <div>
+                            <h4>Operational Hours</h4>
+                            <p>Monday - Saturday</p>
+                            <span class="contact-sub">9:00 AM - 8:00 PM IST</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="contact-form-col">
+                    <div class="card glass-card contact-card">
+                        <h3 class="contact-form-title"><i class="fa-solid fa-paper-plane"></i> Send Us a Message</h3>
+                        <form method="POST" action="/contact">
+                            <div class="form-group">
+                                <label class="form-label">Your Name <span class="req">*</span></label>
+                                <div class="input-wrapper">
+                                    <input type="text" name="name" class="form-control" placeholder="Enter your full name" required>
+                                    <i class="fa-solid fa-user input-icon"></i>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email Address <span class="req">*</span></label>
+                                <div class="input-wrapper">
+                                    <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
+                                    <i class="fa-solid fa-envelope input-icon"></i>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Subject</label>
+                                <div class="input-wrapper">
+                                    <input type="text" name="subject" class="form-control" placeholder="How can we help you?">
+                                    <i class="fa-solid fa-tag input-icon"></i>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Message <span class="req">*</span></label>
+                                <textarea name="message" class="form-control" rows="4" placeholder="Write your message or inquiry here..." required style="padding-left: 1rem;"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block btn-lg">
+                                <i class="fa-solid fa-paper-plane"></i> Submit Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================
+         6. PUBLIC FOOTER
+         ========================================================= -->
+    <footer class="public-footer">
+        <div class="public-footer-container">
+            <div class="footer-top-grid">
+                <!-- Brand Column -->
+                <div class="footer-col footer-brand-col">
+                    <div class="public-brand footer-brand">
+                        <div class="public-brand-icon">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </div>
+                        <span class="brand-name">Smart<span>Cart</span></span>
+                    </div>
+                    <p class="footer-desc">
+                        A modern, smart, and secure e-commerce shopping experience with integrated Razorpay payments and dedicated store management.
+                    </p>
+                    <div class="footer-security-pill">
+                        <i class="fa-solid fa-lock"></i> 256-Bit SSL Encrypted & Protected
+                    </div>
+                </div>
+
+                <!-- Portals Column -->
+                <div class="footer-col">
+                    <h4 class="footer-col-title">Portals</h4>
+                    <ul class="footer-links">
+                        <li><a href="/user-login"><i class="fa-solid fa-store"></i> Customer Login</a></li>
+                        <li><a href="/user-signup"><i class="fa-solid fa-user-plus"></i> Customer Register</a></li>
+                        <li><a href="/user/forgot-password"><i class="fa-solid fa-key"></i> Customer Password Reset</a></li>
+                        <li><a href="/admin-login"><i class="fa-solid fa-shield-halved"></i> Admin Portal</a></li>
+                        <li><a href="/admin-signup"><i class="fa-solid fa-user-shield"></i> Admin Register</a></li>
+                        <li><a href="/admin/forgot-password"><i class="fa-solid fa-key"></i> Admin Password Reset</a></li>
+                    </ul>
+                </div>
+
+                <!-- Navigation Column -->
+                <div class="footer-col">
+                    <h4 class="footer-col-title">Navigation</h4>
+                    <ul class="footer-links">
+                        <li><a href="#hero"><i class="fa-solid fa-chevron-right"></i> Home</a></li>
+                        <li><a href="#portals"><i class="fa-solid fa-chevron-right"></i> Portal Selection</a></li>
+                        <li><a href="#features"><i class="fa-solid fa-chevron-right"></i> Features</a></li>
+                        <li><a href="#about"><i class="fa-solid fa-chevron-right"></i> About Us</a></li>
+                        <li><a href="#contact"><i class="fa-solid fa-chevron-right"></i> Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Payment Methods Column -->
+                <div class="footer-col">
+                    <h4 class="footer-col-title">Payment & Trust</h4>
+                    <p class="footer-desc" style="margin-bottom: 0.75rem;">
+                        Guaranteed secure transactions powered by Razorpay.
+                    </p>
+                    <div class="footer-payment-icons">
+                        <span class="payment-badge"><i class="fa-brands fa-cc-visa"></i> Visa</span>
+                        <span class="payment-badge"><i class="fa-brands fa-cc-mastercard"></i> Master</span>
+                        <span class="payment-badge"><i class="fa-solid fa-mobile-screen"></i> UPI</span>
+                        <span class="payment-badge"><i class="fa-solid fa-building-columns"></i> NetBanking</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom-bar">
+                <p>&copy; 2026 SmartCart E-Commerce Platform. All rights reserved.</p>
+                <div class="footer-bottom-links">
+                    <a href="#hero">Back to Top <i class="fa-solid fa-arrow-up"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Drawer Script -->
+    <script>
+        const menuToggle = document.getElementById('public-menu-toggle');
+        const mobileDrawer = document.getElementById('public-mobile-drawer');
+
+        if (menuToggle && mobileDrawer) {
+            menuToggle.addEventListener('click', function () {
+                mobileDrawer.classList.toggle('open');
+                const icon = menuToggle.querySelector('i');
+                if (mobileDrawer.classList.contains('open')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-xmark');
+                } else {
+                    icon.classList.remove('fa-xmark');
+                    icon.classList.add('fa-bars');
+                }
+            });
+
+            // Close drawer when clicking any anchor inside it
+            const drawerLinks = mobileDrawer.querySelectorAll('a');
+            drawerLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileDrawer.classList.remove('open');
+                    const icon = menuToggle.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('fa-xmark');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+            });
+        }
+    </script>
+
+</body>
+</html>
