@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
+
 <body>
 
     <!-- Header / Navbar -->
@@ -47,18 +49,18 @@
 
         <!-- Flash messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div class="flash-container">
+        {% if messages %}
+        <div class="flash-container">
             {% for category, message in messages %}
-              <div class="flash-alert flash-{{ category if category != 'message' else 'danger' }}">
+            <div class="flash-alert flash-{{ category if category != 'message' else 'danger' }}">
                 <div class="flash-alert-content">
-                  <i class="fa-solid fa-circle-exclamation flash-alert-icon"></i>
-                  <span>{{ message }}</span>
+                    <i class="fa-solid fa-circle-exclamation flash-alert-icon"></i>
+                    <span>{{ message }}</span>
                 </div>
-              </div>
-            {% endfor %}
             </div>
-          {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
         {% endwith %}
 
         <!-- =========================================================
@@ -69,59 +71,76 @@
             <div class="card-header" style="flex-wrap: wrap; gap: 0.75rem;">
                 <div>
                     <h2 class="card-title">
-                        <i class="fa-solid fa-house-chimney-user" style="color: var(--primary);"></i> Your Saved Delivery Address
+                        <i class="fa-solid fa-house-chimney-user" style="color: var(--primary);"></i> Your Saved
+                        Delivery Address
                     </h2>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">
                         Select a saved permanent address for lightning-fast checkout
                     </p>
                 </div>
-                <button type="button" class="btn btn-outline-primary btn-sm" id="toggle-new-address-btn" onclick="toggleNewAddressForm()">
+                <button type="button" class="btn btn-outline-primary btn-sm" id="toggle-new-address-btn"
+                    onclick="toggleNewAddressForm()">
                     <i class="fa-solid fa-plus"></i> Add New Address
                 </button>
             </div>
 
             <div class="saved-address-list" style="display: flex; flex-direction: column; gap: 1.25rem;">
                 {% for addr in saved_addresses %}
-                <div class="saved-address-card {% if addr.is_default or (default_address and addr.address_id == default_address.address_id) %}selected-address{% endif %}" style="background: var(--bg-surface); border: 2px solid {% if addr.is_default or (default_address and addr.address_id == default_address.address_id) %}var(--primary){% else %}var(--border-subtle){% endif %}; border-radius: var(--radius-md); padding: 1.25rem; position: relative; transition: all var(--transition-fast);">
-                    
-                    <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.6rem;">
+                <div
+                    class="saved-address-card {% if addr.is_default or (default_address and addr.address_id == default_address.address_id) %}selected-address{% endif %}">
+
+                    <div
+                        style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.6rem;">
                         <div style="display: flex; align-items: center; gap: 0.6rem;">
-                            <span style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);">{{ addr.full_name }}</span>
-                            {% if addr.is_default or (default_address and addr.address_id == default_address.address_id) %}
-                                <span class="badge badge-primary"><i class="fa-solid fa-star"></i> DEFAULT</span>
+                            <span style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);">{{
+                                addr.full_name }}</span>
+                            {% if addr.is_default or (default_address and addr.address_id == default_address.address_id)
+                            %}
+                            <span class="badge badge-primary"><i class="fa-solid fa-star"></i> DEFAULT</span>
                             {% endif %}
                             <span class="badge badge-neutral"><i class="fa-solid fa-location-dot"></i> HOME</span>
                         </div>
                         <span style="font-weight: 700; color: var(--text-muted); font-size: 0.9rem;">
-                            <i class="fa-solid fa-phone" style="font-size: 0.8rem; color: var(--primary);"></i> {{ addr.mobile }}
+                            <i class="fa-solid fa-phone" style="font-size: 0.8rem; color: var(--primary);"></i> {{
+                            addr.mobile }}
                         </span>
                     </div>
 
                     <div style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 1rem;">
-                        {{ addr.house_number }}, {{ addr.area }}{% if addr.landmark %}, Near {{ addr.landmark }}{% endif %}<br>
+                        {{ addr.house_number }}, {{ addr.area }}{% if addr.landmark %}, Near {{ addr.landmark }}{% endif
+                        %}<br>
                         <strong>{{ addr.city }}, {{ addr.state }} - {{ addr.pincode }}</strong>
                     </div>
 
                     <!-- Actions -->
-                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; padding-top: 0.85rem; border-top: 1px solid var(--border-subtle);">
-                        <form method="POST" action="/user/address/select/{{ addr.address_id }}" style="margin: 0; flex: 1; min-width: 200px;">
-                            <button type="submit" class="btn btn-primary btn-block btn-lg" style="box-shadow: 0 4px 12px var(--primary-glow);">
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; padding-top: 0.85rem; border-top: 1px solid var(--border-subtle);">
+                        <form method="POST" action="/user/address/select/{{ addr.address_id }}"
+                            style="margin: 0; flex: 1; min-width: 200px;">
+                            <button type="submit" class="btn btn-primary btn-block btn-lg"
+                                style="box-shadow: 0 4px 12px var(--primary-glow);">
                                 <i class="fa-solid fa-truck-fast"></i> Deliver to this Address &rarr;
                             </button>
                         </form>
 
                         <div style="display: flex; gap: 0.5rem;">
-                            <button type="button" class="btn btn-outline btn-sm" onclick="editSavedAddress({{ addr|tojson }})" title="Edit Address">
+                            <button type="button" class="btn btn-outline btn-sm" data-address='{{ addr|tojson }}'
+                                onclick="editSavedAddress(this)" title="Edit Address">
                                 <i class="fa-solid fa-pen-to-square"></i> Edit
                             </button>
-                            {% if not addr.is_default %}
-                            <form method="POST" action="/user/address/default/{{ addr.address_id }}" style="display: inline;">
+                            {% if not (addr.is_default or (default_address and addr.address_id ==
+                            default_address.address_id)) %}
+                            <form method="POST" action="/user/address/default/{{ addr.address_id }}"
+                                style="display: inline;">
                                 <button type="submit" class="btn btn-outline btn-sm" title="Set as Default">
                                     <i class="fa-solid fa-star"></i> Set Default
                                 </button>
                             </form>
                             {% endif %}
-                            <a href="/user/address/delete/{{ addr.address_id }}" class="btn btn-outline btn-sm" style="color: var(--danger); border-color: var(--danger-light);" onclick="return confirm('Are you sure you want to delete this address?')" title="Delete Address">
+                            <a href="/user/address/delete/{{ addr.address_id }}" class="btn btn-outline btn-sm"
+                                style="color: var(--danger); border-color: var(--danger-light);"
+                                onclick="return confirm('Are you sure you want to delete this address?')"
+                                title="Delete Address">
                                 <i class="fa-solid fa-trash-can"></i>
                             </a>
                         </div>
@@ -136,99 +155,111 @@
         <!-- =========================================================
              ADD / EDIT ADDRESS FORM CONTAINER
              ========================================================= -->
-        <div class="card glass-card" id="address-form-card" style="{% if saved_addresses and saved_addresses|length > 0 %}display: none;{% endif %}">
-            <div class="card-header">
-                <h2 class="card-title" id="form-card-title">
-                    <i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Add New Delivery Address
-                </h2>
-                {% if saved_addresses and saved_addresses|length > 0 %}
-                <button type="button" class="btn btn-secondary btn-sm" onclick="cancelAddressEdit()">
-                    <i class="fa-solid fa-xmark"></i> Close Form
-                </button>
+        {% if saved_addresses and saved_addresses|length > 0 %}
+        <div class="card glass-card" id="address-form-card" style="display: none;">
+            {% else %}
+            <div class="card glass-card" id="address-form-card">
                 {% endif %}
-            </div>
-
-            <form method="POST" action="/user/address/continue" id="address-form">
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label class="form-label">Full Name <span class="req">*</span></label>
-                        <div class="input-wrapper">
-                            <input type="text" name="full_name" id="field_full_name" class="form-control" placeholder="Recipient's full name" required>
-                            <i class="fa-solid fa-user input-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Mobile Number (10 digits) <span class="req">*</span></label>
-                        <div class="input-wrapper">
-                            <input type="tel" name="mobile" id="field_mobile" class="form-control" pattern="[0-9]{10}" maxlength="10" placeholder="9876543210" required>
-                            <i class="fa-solid fa-phone input-icon"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label class="form-label">House / Flat / Building No. <span class="req">*</span></label>
-                        <div class="input-wrapper">
-                            <input type="text" name="house_number" id="field_house_number" class="form-control" placeholder="Apt 4B, Sunrise Towers" required>
-                            <i class="fa-solid fa-house-chimney input-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Street / Area / Colony <span class="req">*</span></label>
-                        <div class="input-wrapper">
-                            <input type="text" name="area" id="field_area" class="form-control" placeholder="MG Road, Indiranagar" required>
-                            <i class="fa-solid fa-road input-icon"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Landmark (Optional)</label>
-                    <div class="input-wrapper">
-                        <input type="text" name="landmark" id="field_landmark" class="form-control" placeholder="Near City Mall, Opposite Metro Pillar 104">
-                        <i class="fa-solid fa-map-pin input-icon"></i>
-                    </div>
-                </div>
-
-                <div class="form-grid-2">
-                    <div class="form-group">
-                        <label class="form-label">City <span class="req">*</span></label>
-                        <div class="input-wrapper">
-                            <input type="text" name="city" id="field_city" class="form-control" placeholder="Bengaluru" required>
-                            <i class="fa-solid fa-city input-icon"></i>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">State <span class="req">*</span></label>
-                        <div class="input-wrapper">
-                            <input type="text" name="state" id="field_state" class="form-control" placeholder="Karnataka" required>
-                            <i class="fa-solid fa-map input-icon"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group" style="max-width: 320px;">
-                    <label class="form-label">PIN Code (6 digits) <span class="req">*</span></label>
-                    <div class="input-wrapper">
-                        <input type="text" name="pincode" id="field_pincode" class="form-control" pattern="[0-9]{6}" maxlength="6" placeholder="560038" required>
-                        <i class="fa-solid fa-envelope-open-text input-icon"></i>
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <a href="/user/cart" class="btn btn-secondary">
-                        <i class="fa-solid fa-arrow-left"></i> Back to Cart
-                    </a>
-                    <button type="submit" class="btn btn-primary btn-lg" id="submit-address-btn">
-                        <i class="fa-solid fa-floppy-disk"></i> Save & Proceed to Payment &rarr;
+                <div class="card-header">
+                    <h2 class="card-title" id="form-card-title">
+                        <i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Add New Delivery Address
+                    </h2>
+                    {% if saved_addresses and saved_addresses|length > 0 %}
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="cancelAddressEdit()">
+                        <i class="fa-solid fa-xmark"></i> Close Form
                     </button>
+                    {% endif %}
                 </div>
-            </form>
-        </div>
+
+                <form method="POST" action="/user/address/continue" id="address-form">
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Full Name <span class="req">*</span></label>
+                            <div class="input-wrapper">
+                                <input type="text" name="full_name" id="field_full_name" class="form-control"
+                                    placeholder="Recipient's full name" required>
+                                <i class="fa-solid fa-user input-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Mobile Number (10 digits) <span class="req">*</span></label>
+                            <div class="input-wrapper">
+                                <input type="tel" name="mobile" id="field_mobile" class="form-control"
+                                    pattern="[0-9]{10}" maxlength="10" placeholder="9876543210" required>
+                                <i class="fa-solid fa-phone input-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">House / Flat / Building No. <span class="req">*</span></label>
+                            <div class="input-wrapper">
+                                <input type="text" name="house_number" id="field_house_number" class="form-control"
+                                    placeholder="Apt 4B, Sunrise Towers" required>
+                                <i class="fa-solid fa-house-chimney input-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Street / Area / Colony <span class="req">*</span></label>
+                            <div class="input-wrapper">
+                                <input type="text" name="area" id="field_area" class="form-control"
+                                    placeholder="MG Road, Indiranagar" required>
+                                <i class="fa-solid fa-road input-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Landmark (Optional)</label>
+                        <div class="input-wrapper">
+                            <input type="text" name="landmark" id="field_landmark" class="form-control"
+                                placeholder="Near City Mall, Opposite Metro Pillar 104">
+                            <i class="fa-solid fa-map-pin input-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">City <span class="req">*</span></label>
+                            <div class="input-wrapper">
+                                <input type="text" name="city" id="field_city" class="form-control"
+                                    placeholder="Bengaluru" required>
+                                <i class="fa-solid fa-city input-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">State <span class="req">*</span></label>
+                            <div class="input-wrapper">
+                                <input type="text" name="state" id="field_state" class="form-control"
+                                    placeholder="Karnataka" required>
+                                <i class="fa-solid fa-map input-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="max-width: 320px;">
+                        <label class="form-label">PIN Code (6 digits) <span class="req">*</span></label>
+                        <div class="input-wrapper">
+                            <input type="text" name="pincode" id="field_pincode" class="form-control" pattern="[0-9]{6}"
+                                maxlength="6" placeholder="560038" required>
+                            <i class="fa-solid fa-envelope-open-text input-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="/user/cart" class="btn btn-secondary">
+                            <i class="fa-solid fa-arrow-left"></i> Back to Cart
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg" id="submit-address-btn">
+                            <i class="fa-solid fa-floppy-disk"></i> Save & Proceed to Payment &rarr;
+                        </button>
+                    </div>
+                </form>
+            </div>
 
     </main>
 
@@ -274,12 +305,17 @@
             const title = document.getElementById('form-card-title');
             const submitBtn = document.getElementById('submit-address-btn');
 
+            const isEditMode = form.action.includes('/user/address/update');
+
             form.action = '/user/address/continue';
             title.innerHTML = '<i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Add New Delivery Address';
             submitBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save & Proceed to Payment &rarr;';
             form.reset();
 
-            if (formCard.style.display === 'none' || formCard.style.display === '') {
+            if (isEditMode) {
+                formCard.style.display = 'block';
+                formCard.scrollIntoView({ behavior: 'smooth' });
+            } else if (formCard.style.display === 'none' || formCard.style.display === '') {
                 formCard.style.display = 'block';
                 formCard.scrollIntoView({ behavior: 'smooth' });
             } else {
@@ -287,7 +323,18 @@
             }
         }
 
-        function editSavedAddress(addr) {
+        function editSavedAddress(elementOrData) {
+            let addr = elementOrData;
+            if (elementOrData && elementOrData.dataset && elementOrData.dataset.address) {
+                try {
+                    addr = JSON.parse(elementOrData.dataset.address);
+                } catch (e) {
+                    console.error("Failed to parse address data:", e);
+                    return;
+                }
+            }
+            if (!addr) return;
+
             const formCard = document.getElementById('address-form-card');
             const form = document.getElementById('address-form');
             const title = document.getElementById('form-card-title');
@@ -312,9 +359,13 @@
 
         function cancelAddressEdit() {
             const formCard = document.getElementById('address-form-card');
+            const form = document.getElementById('address-form');
+            form.reset();
+            form.action = '/user/address/continue';
             formCard.style.display = 'none';
         }
     </script>
 
 </body>
+
 </html>

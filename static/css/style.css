@@ -3010,4 +3010,26 @@ input[type="checkbox"] {
   }
 }
 
+/* ==========================================================================
+   SAVED ADDRESS CARDS
+   ========================================================================== */
 
+.saved-address-card {
+  background: var(--bg-surface);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.saved-address-card:hover {
+  border-color: #c7d2fe;
+  box-shadow: var(--shadow-sm);
+}
+
+.saved-address-card.selected-address {
+  border-color: var(--primary);
+  background: var(--bg-surface);
+  box-shadow: 0 0 0 1px var(--primary-glow);
+}
