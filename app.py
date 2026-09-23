@@ -215,7 +215,6 @@ def check_password(plain_password: str, stored_hash) -> bool:
 # =========================================================
 
 def load_user_cart(user_id):
-
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -233,22 +232,28 @@ def load_user_cart(user_id):
     """, (user_id,))
 
     items = cursor.fetchall()
-
     cursor.close()
     conn.close()
 
     cart = {}
-
     for item in items:
+        if item.get('product_id') is not None:
+            pid = str(item['product_id'])
+            try:
+                price_val = float(item.get('price') or 0)
+            except (ValueError, TypeError):
+                price_val = 0.0
+            try:
+                qty_val = int(item.get('quantity') or 1)
+            except (ValueError, TypeError):
+                qty_val = 1
 
-        pid = str(item['product_id'])
-
-        cart[pid] = {
-            'name': item['name'],
-            'price': float(item['price']),
-            'image': item['image'],
-            'quantity': item['quantity']
-        }
+            cart[pid] = {
+                'name': item.get('name') or 'Product',
+                'price': price_val,
+                'image': item.get('image') or '',
+                'quantity': qty_val
+            }
 
     return cart
 
@@ -4145,10 +4150,10 @@ def handle_404_error(e):
 # =========================================================
 
 if __name__ == '__main__':
-
     port = int(os.environ.get('PORT', 5000))
+    debug_mode = os.environ.get('FLASK_DEBUG', 'True').lower() in ('true', '1', 't')
     app.run(
         host='0.0.0.0',
         port=port,
-        debug=False
+        debug=debug_mode
     )
