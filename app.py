@@ -98,7 +98,7 @@ class SQLiteConnectionWrapper:
 def get_db_connection():
     default_db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "smartcart.db")
     db_path = os.environ.get('DB_PATH', getattr(config, 'DB_PATH', default_db_path))
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, timeout=30.0, check_same_thread=False)
     conn.row_factory = dict_factory
     return SQLiteConnectionWrapper(conn)
 
@@ -106,6 +106,10 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
+    try:
+        cursor.execute("PRAGMA journal_mode=WAL;")
+    except Exception:
+        pass
     cursor.executescript("""
     CREATE TABLE IF NOT EXISTS admin (
         admin_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -415,23 +419,32 @@ def verify_otp_post():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
-        INSERT INTO admin
-        (name, email, password)
-        VALUES (?, ?, ?)
-        """,
-        (
-            session['signup_name'],
-            session['signup_email'],
-            hashed_password
+    try:
+        cursor.execute(
+            """
+            INSERT INTO admin
+            (name, email, password)
+            VALUES (?, ?, ?)
+            """,
+            (
+                session['signup_name'],
+                session['signup_email'],
+                hashed_password
+            )
         )
-    )
-
-    conn.commit()
-
-    cursor.close()
-    conn.close()
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.rollback()
+        flash("This email is already registered. Please login.", "warning")
+        return redirect('/admin-login')
+    except Exception as e:
+        conn.rollback()
+        app.logger.error("Admin registration error: %s", str(e))
+        flash("Registration error. Please try again.", "danger")
+        return redirect('/admin-signup')
+    finally:
+        cursor.close()
+        conn.close()
 
     session.pop('otp', None)
     session.pop('signup_name', None)
@@ -1305,20 +1318,29 @@ def verify_user_otp_post():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
-        INSERT INTO users
-        (name, email, password)
-        VALUES (?, ?, ?)
-    """, (
-        session['signup_name'],
-        session['signup_email'],
-        hashed_password
-    ))
-
-    conn.commit()
-
-    cursor.close()
-    conn.close()
+    try:
+        cursor.execute("""
+            INSERT INTO users
+            (name, email, password)
+            VALUES (?, ?, ?)
+        """, (
+            session['signup_name'],
+            session['signup_email'],
+            hashed_password
+        ))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        conn.rollback()
+        flash("This email is already registered. Please login.", "warning")
+        return redirect('/user-login')
+    except Exception as e:
+        conn.rollback()
+        app.logger.error("User registration error: %s", str(e))
+        flash("Registration error. Please try again.", "danger")
+        return redirect('/user-signup')
+    finally:
+        cursor.close()
+        conn.close()
 
     session.pop('otp', None)
     session.pop('signup_name', None)
@@ -4135,9 +4157,8 @@ def user_logout():
 @app.errorhandler(500)
 def handle_500_error(e):
     app.logger.error("Internal Server Error: %s\n%s", str(e), traceback.format_exc())
-    return render_template(
-        "user/user_login.html"
-    ), 500
+    flash("An unexpected server error occurred. Please try again.", "danger")
+    return redirect('/user-login')
 
 
 @app.errorhandler(404)
