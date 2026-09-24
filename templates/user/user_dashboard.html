@@ -103,7 +103,7 @@
                 <i class="fa-regular fa-user"></i> My Profile ({{ user_name }})
             </a>
             <a href="/user/cart" class="smart-nav-item-link">
-                <i class="fa-solid fa-bag-shopping"></i> Shopping Cart ({{ session.get('cart')|length if session.get('cart') else 0 }})
+                <i class="fa-solid fa-bag-shopping"></i> Shopping Cart (<span id="drawer-cart-count">{{ session.get('cart')|length if session.get('cart') else 0 }}</span>)
             </a>
             <a href="/user-logout" class="smart-nav-item-link" style="color: var(--danger);">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
@@ -630,22 +630,28 @@
                     button.innerHTML = originalText;
                     button.disabled = false;
 
-                    if (!data) return;
+                    showToast("✔ " + (data.message || "Item added to cart!"));
 
-                    if (data.error) {
-                        showToast(data.error, true);
-                        return;
-                    }
+                    // Realtime accurate badge updates from backend
+                    const newCount = (data && data.cart_count !== undefined) ? data.cart_count : (parseInt(document.getElementById("cart-nav-count")?.innerText || 0) + 1);
 
+                    // 1. Top Navbar Badge
                     const badge = document.getElementById("cart-nav-count");
-                    const bottomBadge = document.getElementById("bottom-cart-count");
                     if (badge) {
-                        let current = parseInt(badge.innerText) || 0;
-                        badge.innerText = current + 1;
+                        badge.innerText = newCount;
                     }
+
+                    // 2. Mobile Bottom Bar Badge
+                    const bottomBadge = document.getElementById("bottom-cart-count");
                     if (bottomBadge) {
-                        let current = parseInt(bottomBadge.innerText) || 0;
-                        bottomBadge.innerText = current + 1;
+                        bottomBadge.innerText = newCount;
+                        bottomBadge.style.display = newCount > 0 ? "flex" : "none";
+                    }
+
+                    // 3. Mobile Drawer Cart Badge
+                    const drawerCount = document.getElementById("drawer-cart-count");
+                    if (drawerCount) {
+                        drawerCount.innerText = newCount;
                     }
                 })
                 .catch(function(error) {
@@ -680,9 +686,7 @@
             <div class="bottom-cart-badge-wrap">
                 <i class="fa-solid fa-cart-shopping"></i>
                 {% set cart_len = session.get('cart')|length if session.get('cart') else 0 %}
-                {% if cart_len > 0 %}
-                <span class="bottom-cart-count" id="bottom-cart-count">{{ cart_len }}</span>
-                {% endif %}
+                <span class="bottom-cart-count" id="bottom-cart-count" style="display: {{ 'flex' if cart_len > 0 else 'none' }};">{{ cart_len }}</span>
             </div>
             <span>Cart</span>
         </a>

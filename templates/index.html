@@ -201,21 +201,33 @@
 
         .public-mobile-toggle {
             display: none;
-            background: none;
-            border: none;
+            background: transparent;
+            border: 1px solid #e2e8f0;
             font-size: 1.35rem;
             color: #0f172a;
             cursor: pointer;
-            padding: 0.4rem;
+            padding: 0.45rem 0.65rem;
+            border-radius: 10px;
+            min-width: 44px;
+            min-height: 44px;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .public-mobile-toggle:hover {
+            background: #f1f5f9;
+            color: #4f46e5;
         }
 
         .public-mobile-drawer {
-            display: none !important;
+            display: none;
             flex-direction: column;
             background: #ffffff;
             border-top: 1px solid #e2e8f0;
             padding: 1.25rem;
             gap: 0.75rem;
+            animation: drawerSlideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .public-mobile-drawer.open {
@@ -439,7 +451,7 @@
             }
 
             .public-mobile-toggle {
-                display: block !important;
+                display: inline-flex !important;
             }
 
             .portal-square-grid {

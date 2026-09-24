@@ -34,10 +34,10 @@
                 </a>
             </li>
             <li>
-                <a href="/user/cart" class="cart-link-btn">
+                <a href="/user/cart" class="cart-link-btn" id="cart-nav-btn">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span>Cart</span>
-                    <span class="cart-count-badge">{{ session.get('cart')|length if session.get('cart') else 0 }}</span>
+                    <span class="cart-count-badge" id="cart-nav-count">{{ session.get('cart')|length if session.get('cart') else 0 }}</span>
                 </a>
             </li>
             <li>
@@ -69,7 +69,7 @@
                 <i class="fa-solid fa-box-open"></i> My Orders & Returns
             </a>
             <a href="/user/cart" class="smart-nav-item-link">
-                <i class="fa-solid fa-bag-shopping"></i> Shopping Cart ({{ session.get('cart')|length if session.get('cart') else 0 }})
+                <i class="fa-solid fa-bag-shopping"></i> Shopping Cart (<span id="drawer-cart-count">{{ session.get('cart')|length if session.get('cart') else 0 }}</span>)
             </a>
             <a href="/user/profile" class="smart-nav-item-link">
                 <i class="fa-regular fa-user"></i> My Profile
@@ -79,6 +79,12 @@
             </a>
         </div>
     </header>
+
+    <!-- Toast Notification Container -->
+    <div id="toast" class="toast-notification">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toast-message">Item added to cart!</span>
+    </div>
 
     <!-- Main Content -->
     <main class="page-wrapper">
@@ -184,9 +190,7 @@
             <div class="bottom-cart-badge-wrap">
                 <i class="fa-solid fa-cart-shopping"></i>
                 {% set cart_len = session.get('cart')|length if session.get('cart') else 0 %}
-                {% if cart_len > 0 %}
-                <span class="bottom-cart-count">{{ cart_len }}</span>
-                {% endif %}
+                <span class="bottom-cart-count" id="bottom-cart-count" style="display: {{ 'flex' if cart_len > 0 else 'none' }};">{{ cart_len }}</span>
             </div>
             <span>Cart</span>
         </a>
@@ -198,10 +202,36 @@
     </footer>
 
     <script>
+        function showToast(message, isError = false) {
+            const toast = document.getElementById("toast");
+            const toastMsg = document.getElementById("toast-message");
+            if (!toast || !toastMsg) return;
+            const toastIcon = toast.querySelector("i");
+            
+            toastMsg.innerText = message;
+            if (isError) {
+                if (toastIcon) {
+                    toastIcon.className = "fa-solid fa-triangle-exclamation";
+                    toastIcon.style.color = "var(--danger)";
+                }
+            } else {
+                if (toastIcon) {
+                    toastIcon.className = "fa-solid fa-circle-check";
+                    toastIcon.style.color = "var(--success)";
+                }
+            }
+            
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
         const btn = document.getElementById("detail-add-cart-btn");
         if (btn) {
             btn.addEventListener("click", function() {
                 const pid = btn.getAttribute("data-product-id");
+                const originalText = btn.innerHTML;
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding...';
                 
@@ -215,19 +245,38 @@
                 })
                 .then(data => {
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
+                    btn.innerHTML = originalText;
                     if (!data) return;
                     if (data.error) {
-                        alert(data.error);
+                        showToast(data.error, true);
                         return;
                     }
-                    alert("✔ " + data.message);
-                    window.location.reload();
+                    showToast("✔ " + (data.message || "Item added to cart!"));
+
+                    // Realtime accurate badge updates
+                    const newCount = (data && data.cart_count !== undefined) ? data.cart_count : (parseInt(document.getElementById("cart-nav-count")?.innerText || 0) + 1);
+
+                    const badge = document.getElementById("cart-nav-count");
+                    if (badge) {
+                        badge.innerText = newCount;
+                    }
+
+                    const bottomBadge = document.getElementById("bottom-cart-count");
+                    if (bottomBadge) {
+                        bottomBadge.innerText = newCount;
+                        bottomBadge.style.display = newCount > 0 ? "flex" : "none";
+                    }
+
+                    const drawerCount = document.getElementById("drawer-cart-count");
+                    if (drawerCount) {
+                        drawerCount.innerText = newCount;
+                    }
                 })
                 .catch(err => {
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
-                    alert("Failed to add to cart");
+                    btn.innerHTML = originalText;
+                    console.log("Error:", err);
+                    showToast("Failed to add product to cart.", true);
                 });
             });
         }
