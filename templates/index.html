@@ -509,7 +509,7 @@
             </div>
 
             <!-- Mobile Hamburger Toggle Button -->
-            <button type="button" class="public-mobile-toggle" id="public-menu-toggle" aria-label="Toggle navigation menu">
+            <button type="button" class="public-mobile-toggle" id="public-menu-toggle" aria-label="Toggle navigation menu" onclick="if(window.toggleSmartDrawer){window.toggleSmartDrawer('public-menu-toggle','public-mobile-drawer');}else{var d=document.getElementById('public-mobile-drawer');var open=d.classList.toggle('open');d.style.display=open?'flex':'none';}">
                 <i class="fa-solid fa-bars"></i>
             </button>
         </div>
@@ -621,6 +621,6 @@
     </footer>
 
     <!-- Mobile Drawer Script -->
-    <script src="/static/js/navbar.js"></script>
+    <script src="/static/js/navbar.js?v=2.2"></script>
 </body>
 </html>

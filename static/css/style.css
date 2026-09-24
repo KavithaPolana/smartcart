@@ -2663,23 +2663,35 @@ input[type="checkbox"] {
 
   /* Single Unified Navbar on User Dashboard */
   .smart-nav-container {
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.75rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .smart-brand-link {
+    order: 1 !important;
+  }
+
+  .smart-mobile-toggle {
+    order: 2 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-left: auto !important;
   }
   
   .smart-nav-search-wrap {
-    order: 3;
-    max-width: 100%;
-    width: 100%;
-  }
-  
-  .smart-mobile-toggle {
-    display: block;
+    order: 3 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    flex: 1 1 100% !important;
   }
   
   .smart-nav-menu {
-    display: none;
+    display: none !important;
   }
 
   /* Hero Banner */

@@ -53,7 +53,7 @@
         </ul>
 
         <!-- Mobile Hamburger Toggle Button (3 Lines) -->
-        <button type="button" class="smart-mobile-toggle" id="smart-menu-toggle" aria-label="Toggle Navigation Menu">
+        <button type="button" class="smart-mobile-toggle" id="smart-menu-toggle" aria-label="Toggle Navigation Menu" onclick="if(window.toggleSmartDrawer){window.toggleSmartDrawer('smart-menu-toggle','smart-mobile-drawer');}else{var d=document.getElementById('smart-mobile-drawer');var open=d.classList.toggle('open');d.style.display=open?'flex':'none';}">
             <i class="fa-solid fa-bars"></i>
         </button>
 
@@ -359,6 +359,6 @@
     </footer>
 
     <!-- Mobile Navigation Drawer Controller -->
-    <script src="/static/js/navbar.js"></script>
+    <script src="/static/js/navbar.js?v=2.2"></script>
 </body>
 </html>
