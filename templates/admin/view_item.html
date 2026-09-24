@@ -34,6 +34,33 @@
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </a>
         </nav>
+
+        <!-- Mobile Hamburger Toggle Button (3 Lines) -->
+        <button type="button" class="admin-mobile-toggle" id="admin-menu-toggle" aria-label="Toggle Admin Menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <!-- Mobile Drawer Navigation Menu -->
+        <div class="admin-mobile-drawer" id="admin-mobile-drawer">
+            <a href="/admin-dashboard" class="drawer-link">
+                <i class="fa-solid fa-gauge"></i> Dashboard Overview
+            </a>
+            <a href="/admin/item-list" class="drawer-link active">
+                <i class="fa-solid fa-boxes-stacked"></i> Product Inventory
+            </a>
+            <a href="/admin/add-item" class="drawer-link">
+                <i class="fa-solid fa-plus-circle"></i> Add New Product
+            </a>
+            <a href="/admin/profile" class="drawer-link">
+                <i class="fa-solid fa-user-shield"></i> Admin Profile
+            </a>
+            <a href="/user/products" target="_blank" class="drawer-link">
+                <i class="fa-solid fa-store"></i> Customer Storefront
+            </a>
+            <a href="/admin-logout" class="drawer-link" style="color: #f87171;">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </a>
+        </div>
     </header>
 
     <!-- Main Content -->
@@ -87,5 +114,7 @@
         <p>&copy; 2026 SmartCart Admin Control Center.</p>
     </footer>
 
+    <!-- Mobile Navigation Drawer Controller -->
+    <script src="/static/js/navbar.js"></script>
 </body>
 </html>

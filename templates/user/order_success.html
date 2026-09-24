@@ -19,6 +19,11 @@
 
         <ul class="nav-links">
             <li>
+                <a href="/user-dashboard" class="nav-link">
+                    <i class="fa-solid fa-house"></i> Dashboard
+                </a>
+            </li>
+            <li>
                 <a href="/user/products" class="nav-link">
                     <i class="fa-solid fa-store"></i> Store
                 </a>
@@ -28,7 +33,44 @@
                     <i class="fa-solid fa-box-open"></i> My Orders
                 </a>
             </li>
+            <li>
+                <a href="/user/profile" class="nav-link">
+                    <i class="fa-solid fa-user"></i> Profile
+                </a>
+            </li>
+            <li>
+                <a href="/user-logout" class="nav-link" style="color: var(--danger);">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </a>
+            </li>
         </ul>
+
+        <!-- Mobile Hamburger Toggle Button (3 Lines) -->
+        <button type="button" class="smart-mobile-toggle" id="smart-menu-toggle" aria-label="Toggle Navigation Menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <!-- Mobile Drawer Navigation Menu -->
+        <div class="smart-mobile-drawer" id="smart-mobile-drawer">
+            <a href="/user-dashboard" class="smart-nav-item-link">
+                <i class="fa-solid fa-house"></i> Home Dashboard
+            </a>
+            <a href="/user/products" class="smart-nav-item-link">
+                <i class="fa-solid fa-store"></i> All Products Catalog
+            </a>
+            <a href="/user/my-orders" class="smart-nav-item-link">
+                <i class="fa-solid fa-box-open"></i> My Orders & Returns
+            </a>
+            <a href="/user/cart" class="smart-nav-item-link">
+                <i class="fa-solid fa-bag-shopping"></i> Shopping Cart
+            </a>
+            <a href="/user/profile" class="smart-nav-item-link">
+                <i class="fa-regular fa-user"></i> My Profile
+            </a>
+            <a href="/user-logout" class="smart-nav-item-link" style="color: var(--danger);">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </a>
+        </div>
     </header>
 
     <!-- Main Content -->
@@ -154,5 +196,7 @@
         <p>&copy; 2026 SmartCart. All rights reserved.</p>
     </footer>
 
+    <!-- Mobile Navigation Drawer Controller -->
+    <script src="/static/js/navbar.js"></script>
 </body>
 </html>

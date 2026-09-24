@@ -17,9 +17,35 @@
             <span>SmartCart</span>
         </a>
 
-        <div class="user-nav-actions">
+        <div class="user-nav-actions" style="display: flex; align-items: center; gap: 0.75rem;">
             <a href="/user/address" class="btn btn-secondary btn-sm">
                 <i class="fa-solid fa-arrow-left"></i> Change Address
+            </a>
+            <!-- Mobile Hamburger Toggle Button (3 Lines) -->
+            <button type="button" class="smart-mobile-toggle" id="smart-menu-toggle" aria-label="Toggle Navigation Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Drawer Navigation Menu -->
+        <div class="smart-mobile-drawer" id="smart-mobile-drawer">
+            <a href="/user-dashboard" class="smart-nav-item-link">
+                <i class="fa-solid fa-house"></i> Home Dashboard
+            </a>
+            <a href="/user/products" class="smart-nav-item-link">
+                <i class="fa-solid fa-store"></i> All Products Catalog
+            </a>
+            <a href="/user/my-orders" class="smart-nav-item-link">
+                <i class="fa-solid fa-box-open"></i> My Orders & Returns
+            </a>
+            <a href="/user/cart" class="smart-nav-item-link">
+                <i class="fa-solid fa-bag-shopping"></i> Shopping Cart ({{ session.get('cart')|length if session.get('cart') else 0 }})
+            </a>
+            <a href="/user/profile" class="smart-nav-item-link">
+                <i class="fa-regular fa-user"></i> My Profile
+            </a>
+            <a href="/user-logout" class="smart-nav-item-link" style="color: var(--danger);">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </a>
         </div>
     </header>
@@ -235,5 +261,7 @@
         };
     </script>
 
+    <!-- Mobile Navigation Drawer Controller -->
+    <script src="/static/js/navbar.js"></script>
 </body>
 </html>
