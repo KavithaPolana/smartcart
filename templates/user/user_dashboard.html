@@ -686,7 +686,11 @@
             <div class="bottom-cart-badge-wrap">
                 <i class="fa-solid fa-cart-shopping"></i>
                 {% set cart_len = session.get('cart')|length if session.get('cart') else 0 %}
-                <span class="bottom-cart-count" id="bottom-cart-count" style="display: {{ 'flex' if cart_len > 0 else 'none' }};">{{ cart_len }}</span>
+                {% if cart_len > 0 %}
+                <span class="bottom-cart-count" id="bottom-cart-count">{{ cart_len }}</span>
+                {% else %}
+                <span class="bottom-cart-count" id="bottom-cart-count" style="display: none;">0</span>
+                {% endif %}
             </div>
             <span>Cart</span>
         </a>
